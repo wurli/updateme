@@ -7,12 +7,20 @@ env_var <- function(x) {
   if (identical(out, "")) NULL else out
 }
 
-is_online <- function() {
-  # curl is faster than pingr, but has hefty system requirements
-  if (is_installed("curl"))
+is_online <- function(use_curl = NULL) {
+  if (use_curl %||% is_installed("curl"))
     return(!is.null(curl::nslookup("google.com", error = FALSE)))
-  if (is_installed("pingr"))
-    return(pingr::is_online(timeout = 1))
+
+  tryCatch(
+    {
+      con <- url("https://google.com")
+      on.exit(close(con))
+      open(con)
+      TRUE
+    },
+    error = function(e) FALSE,
+    warning = function(w) FALSE
+  )
 }
 
 list_replace <- function(x, ...) {

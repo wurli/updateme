@@ -21,7 +21,6 @@ inform_load <- function(pkg) {
   else
     "ahead"
 
-
   fmt_currentness <- switch(currentness,
     unknown = cli::col_silver,
     outdated = cli::col_red,
@@ -67,34 +66,6 @@ available_packages_impl <- function(repo) {
     subset(select = c(Repository, Package, Version))
 }
 
-#' Figure out where a package was installed from
-#'
-#' Checks the following sources (in order):
-#'
-#'   1. Repository
-#'      - Might be a URL, in which case is retrieved using
-#'        [available_packages()], or an alias, in which case the URL is
-#'        checked against the `repos` global option (if not found, skip to 5.)
-#'   2. RemoteType
-#'      - if 'github' then make a URL using GithubRepo and GithubUsername fields
-#'   3. RemoteUrl (not yet implemented)
-#'      - Use to ~ somehow ~ get pkg description? Not sure this can be done
-#'      in a general way without downloading the whole repo, which isn't viable.
-#'      Maybe just need to support alternative methods like butbucket, gitlab etc
-#'      individually.
-#'   4. BiocViews
-#'      - Use to ~ somehow ~ get pkg description
-#'   5. Just check [available_packages()] with default repos
-#'   6. Return NULL
-#'
-#' @param pkg A package
-#' @param lib.loc Optionally, the library location
-#'
-#' @return A named list, including at least the fields `Available_Sources`,
-#'   `Package`, `Version_Installed`, and possibly additional fields
-#'   `Repository`, `Github_Username`, `Github_Repository`, `Remote_URL`, and
-#'   `Bioc_Views`
-#' @noRd
 package_installation_info <- function(pkg, lib.loc = NULL) {
 
   desc <- package_description(

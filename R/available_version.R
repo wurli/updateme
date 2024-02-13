@@ -100,10 +100,11 @@ available_version_impl_repo <- function(pkg, repo = NULL) {
     pkg_data <- pkg_data[1, , drop = FALSE]
   }
 
-  # The last bit of the repo URL can contain some extra stuff - remove this
-  # so we can detect whether it's functionally the same as a repo from the
-  # `repos` global option
-  pattern <- sub("/R/.+$", "", pkg_data[["Repository"]])
+  # The last bit of the repo URL can contain some extra stuff - remove this so
+  # we can detect whether it's the same as a repo from the `repos` global option
+  pattern <- pkg_data[["Repository"]] |>
+    sub(x = _, "/R/.+$", "") |>
+    sub(x = _, "/src/contrib$", "")
 
   repo_alias <- names(repos_option)[grepl(pattern, repos_option, fixed = TRUE)]
   if (length(repo_alias) == 0L || identical(repo_alias, ""))

@@ -2,7 +2,7 @@
 
   # Caches last 1 hour
   updateme_cache <- cachem::cache_mem(
-    max_age = getOption("updateme.cache_age", 60 * 60)
+    max_age = 60 * getOption("updateme.cache_expiry", 60)
   )
 
   available_packages <<- memoise::memoise(
