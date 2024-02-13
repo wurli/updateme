@@ -1,16 +1,23 @@
+the <- new_environment()
+
+
 shims_bind <- function(env = caller_env()) {
   # Args to library() and require() changed after 3.6
   if (getRversion() >= "3.6.0") {
-    env_bind(env,
-      library = shim_library_3_6,
-      require = shim_require_3_6
-    )
+    shim_library <- shim_library_3_6
+    shim_require <- shim_require_3_6
   } else {
-    env_bind(env,
-      library = shim_library_3_1,
-      require = shim_require_3_1
-    )
+    shim_library <- shim_library_3_1
+    shim_require <- shim_require_3_1
   }
+
+  env_bind(
+    env,
+    library = shim_library,
+    require = shim_require
+  )
+
+  NULL
 
 }
 
@@ -26,12 +33,12 @@ shim_library_3_1 <- function(package,
                              quietly = FALSE,
                              verbose = getOption("verbose")) {
 
+  library <- the$conflicted_shims$library %||% library
+
   if (!missing(package)) {
     package <- package_name(enquo(package), character.only = character.only)
 
-    inform_load(package)
-
-    library(
+    out <- library(
       package,
       pos = pos,
       lib.loc = lib.loc,
@@ -41,6 +48,14 @@ shim_library_3_1 <- function(package,
       quietly = quietly,
       verbose = verbose
     )
+
+    if (is_interactive())
+      inform_load(package)
+
+    handle_conflicted()
+
+    invisible(out)
+
   } else if (!missing(help)) {
     help <- package_name(enquo(help), character.only = character.only)
     library(
@@ -69,12 +84,12 @@ shim_library_3_6 <- function(package,
                              include.only,
                              attach.required = missing(include.only)) {
 
+  library <- the$conflicted_shims$library %||% library
+
   if (!missing(package)) {
     package <- package_name(enquo(package), character.only = character.only)
 
-    inform_load(package)
-
-    library(
+    out <- library(
       package,
       pos = pos,
       lib.loc = lib.loc,
@@ -88,6 +103,14 @@ shim_library_3_6 <- function(package,
       include.only = include.only,
       attach.required = attach.required
     )
+
+    if (is_interactive())
+      inform_load(package)
+
+    handle_conflicted()
+
+    invisible(out)
+
   } else if (!missing(help)) {
     help <- package_name(enquo(help), character.only = character.only)
     library(
@@ -108,17 +131,25 @@ shim_require_3_1 <- function(package,
                              quietly = FALSE,
                              warn.conflicts = TRUE,
                              character.only = FALSE) {
+
+  require <- the$conflicted_shims$require %||% require
+
   package <- package_name(enquo(package), character.only = character.only)
 
-  inform_load(package)
-
-  require(
+  out <- require(
     package,
     lib.loc = lib.loc,
     quietly = quietly,
     warn.conflicts = FALSE,
     character.only = TRUE
   )
+
+  if (is_interactive())
+    inform_load(package)
+
+  handle_conflicted()
+
+  invisible(out)
 }
 
 shim_require_3_6 <- function(package,
@@ -130,11 +161,12 @@ shim_require_3_6 <- function(package,
                              exclude,
                              include.only,
                              attach.required = missing(include.only)) {
+
+  require <- the$conflicted_shims$require %||% require
+
   package <- package_name(enquo(package), character.only = character.only)
 
-  inform_load(package)
-
-  require(
+  out <- require(
     package,
     lib.loc = lib.loc,
     quietly = quietly,
@@ -145,6 +177,13 @@ shim_require_3_6 <- function(package,
     include.only = include.only,
     attach.required = attach.required
   )
+
+  if (is_interactive())
+    inform_load(package)
+
+  handle_conflicted()
+
+  invisible(out)
 }
 
 
@@ -163,4 +202,37 @@ package_name <- function(package, character.only = FALSE) {
   }
 
   package
+}
+
+# Adds compatibility with the {conflicted} package, which also shims library
+# and require. Does so by:
+# * Saving the conflicted shims in the$conflicted_shims
+# * Calling these shims in the updateme shims for library and require from
+#   then on
+# * Deleting the shims from the conflicted shim environment, to handle cases
+#   where updateme gets loaded after conflicted
+# This gets called in library(), require(), and .onLoad()
+handle_conflicted <- function() {
+  if (conflicted_loaded()) {
+    the$conflicted_shims <- list(
+      library = get("library", ".conflicts"),
+      require = get("require", ".conflicts")
+    )
+    conflicted_maybe_remove("library")
+    conflicted_maybe_remove("require")
+  }
+}
+
+conflicted_loaded <- function() {
+  all(c("package:conflicted", ".conflicts") %in% search())
+}
+
+conflicted_maybe_remove <- function(x) {
+  if (conflicted_loaded())
+    assign(x, NULL, ".conflicts")
+}
+
+get_shim <- function(x) {
+  if (x %in% ls(".updateme"))
+    get(x, ".updateme")
 }

@@ -1,6 +1,6 @@
 Package: updateme
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Informative Messages About Outdated Packages
 Version: 0.1.0
 Author: Who wrote it
 Maintainer: The package maintainer <yourself@somewhere.net>
@@ -12,10 +12,17 @@ LazyData: true
 Imports: 
     cachem,
     cli,
-    curl,
-    memoise
+    memoise,
+    pingr,
+    rlang,
+    utils
 RoxygenNote: 7.2.3
 Suggests: 
+    curl,
+    gitcreds,
     knitr,
-    rmarkdown
+    rmarkdown,
+    testthat (>= 3.0.0)
 VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)
+Config/testthat/edition: 3

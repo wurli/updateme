@@ -4,7 +4,7 @@
 \name{updateme-package}
 \alias{updateme}
 \alias{updateme-package}
-\title{updateme: What the Package Does (Title Case)}
+\title{updateme: Informative Messages About Outdated Packages}
 \description{
 More about what it does (maybe more than one line) Use four spaces when indenting paragraphs within the Description.
 }
