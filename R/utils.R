@@ -42,4 +42,3 @@ with_timeout <- function(expr, time = Inf){
   )
 }
 
-`%is%` <- identical

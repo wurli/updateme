@@ -9,8 +9,8 @@
     available_packages, cache = updateme_cache
   )
 
-  available_version_impl_github <<- memoise::memoise(
-    available_version_impl_github, cache = updateme_cache
+  available_version_impl_git <<- memoise::memoise(
+    available_version_impl_git, cache = updateme_cache
   )
 
   env <- get("attach")(env(), name = ".updateme")
