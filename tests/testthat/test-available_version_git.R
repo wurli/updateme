@@ -19,6 +19,7 @@ test_that("Description files can be read from GitHub public repos", {
 test_that("Description files can be read from GitHub private repos", {
 
   skip_if_offline()
+  skip_on_ci()
 
   # NOTE: This PAT is 'fine-grained' and gives read-only access for a single
   # repo containing an empty package {updateme.testpkg.private}.
@@ -64,6 +65,7 @@ test_that("Description files can be read from GitLab public repos", {
 test_that("Description files can be read from GitLab private repos", {
 
   skip_if_offline()
+  skip_on_ci()
 
   # NOTE: This PAT is 'fine-grained' and gives read-only access for a single
   # repo containing an empty package {updateme.testpkg.private}.
