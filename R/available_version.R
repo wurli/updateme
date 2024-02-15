@@ -132,7 +132,7 @@ available_version_impl_github <- function(pkg, username, repo) {
     cli::cli_warn(c(
       "Incorrect repo specification for package {.pkg {pkg}}",
       i = "Found DESCRIPTION file for package {.pkg {github_name}}",
-      i = "Check the file at {.url {make_github_url(username, repo)}}"
+      i = "Check the file at {.url {github_url_make(username, repo)}}"
     ))
     return(NULL)
   }

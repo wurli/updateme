@@ -149,6 +149,7 @@ test_that("package_installation_info works with desc RemoteRepo/RemoteUsername f
       'Package: foo',
       'Type: Package',
       'Version: 0.1.0',
+      'RemoteType: github',
       'RemoteUsername: foofyfooson',
       'RemoteRepo: foo'
     )
