@@ -195,8 +195,20 @@ desc_from_github <- function(username, repo, use_curl = TRUE) {
 }
 
 get_github_pat <- function() {
-  if (is_installed("gitcreds"))
-    return(gitcreds::gitcreds_get()[["password"]])
+  # 1. check special updateme env var
+  updateme_github_pat <- env_var("UPDATEME_GITHUB_PAT")
+  if (!is.null(updateme_github_pat))
+    return(updateme_github_pat)
 
+  # 2. check w/{gitcreds} pkg
+  if (is_installed("gitcreds")) {
+    # gitcreds may error if no git installed, no creds set, etc
+    try(silent = TRUE, {
+      pat <- gitcreds::gitcreds_get()[["password"]]
+      return(pat)
+    })
+  }
+
+  # 3. Check standard env vars
   env_var("GITHUB_PAT") %||% env_var("GITHUB_TOKEN")
 }
