@@ -119,7 +119,7 @@ available_version_impl_repo <- function(pkg, repo = NULL) {
 
 
 available_version_impl_github <- function(pkg, username, repo) {
-  response <- desc_from_github(username, repo)
+  response <- desc_from_github(username, repo, pkg)
 
   if (is.null(response))
     return(response)
@@ -147,7 +147,7 @@ available_version_impl_github <- function(pkg, username, repo) {
 
 }
 
-desc_from_github <- function(username, repo, use_curl = TRUE) {
+desc_from_github <- function(username, repo, pkg = repo, use_curl = TRUE) {
   file_url <- paste0(
     "https://raw.githubusercontent.com/",
     username, "/", repo,
@@ -172,19 +172,23 @@ desc_from_github <- function(username, repo, use_curl = TRUE) {
 
       warning_msg <- if (grepl("404", msg)) {
         c(
-          "{.val 404} error: DESCRIPTION not found",
+          i = "{.val 404} error: DESCRIPTION not found",
           i = private_repo_msg,
-          i = no_curl_msg
+          i = paste(
+            "Is the repo private? Perhaps you need to configure",
+            "an {.topic [access token](updateme::`private-repos`)}."
+          )
         )
       } else if (grepl("302", msg)) {
-        "{.val 302} response: not yet implemented" # TODO
+        c(i = "{.val 302} response: not yet implemented") # TODO
       } else if (grepl("403", msg)) {
-        "{.val 403} error: access forbidden"
+        c(i = "{.val 403} error: access forbidden")
       } else {
-        "DESCRIPTION file not accessible: {msg}"
+        c(i = "DESCRIPTION file not accessible: {msg}")
       }
 
       cli::cli_warn(c(
+        "Failed attempting to get a package version for {.pkg {pkg}} from GitHub",
         warning_msg,
         i = "Error occurred accessing URL {.url {file_url}}"
       ))
