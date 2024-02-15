@@ -58,12 +58,16 @@
 #'
 # TODO: Add .append arg?
 updateme_sources_set <- function(...) {
-  out      <- imap(list(...), updateme_sources_validate)
+  options(updateme.sources = updateme_sources_set_impl(...))
+}
+
+updateme_sources_set_impl <- function(...) {
+  # dots_list() prevents names being NULL
+  dots     <- dots_list(...)
+  out      <- imap(dots, updateme_sources_validate)
   sources  <- map(out, function(x) x[["Source_Name"]])
   packages <- map_chr(out, function(x) x[["Package"]] %||% "")
-  out      <- set_names(sources, packages)
-
-  options(updateme.sources = out)
+  set_names(sources, packages)
 }
 
 preferred_sources <- function(pkg) {
@@ -80,10 +84,10 @@ preferred_sources <- function(pkg) {
 
 updateme_sources_validate <- function(src, pkg = NULL, throw = cli::cli_abort) {
 
-  invalid <- function() {
+  handle_no_sources <- function() {
     if (!is.null(throw)) {
       repos <- names(getOption("repos"))
-      throw(c(
+      throw(call = caller_call(6), c(
         "Invalid package source {.val {src}}.",
         "i" = "Package sources must be either:",
         " " = "1. {.val github}, to check the version on GitHub if possible",
@@ -98,7 +102,7 @@ updateme_sources_validate <- function(src, pkg = NULL, throw = cli::cli_abort) {
   pkg_ok <- is.character(pkg) || is.null(pkg)
 
   if (!src_ok || !pkg_ok) {
-    return(invalid())
+    return(handle_no_sources())
   }
 
   if (pkg == "")
@@ -118,31 +122,35 @@ updateme_sources_validate <- function(src, pkg = NULL, throw = cli::cli_abort) {
   if (is_valid_repo(src)) {
     out[["Preferred_Source"]] <- "repo"
     out[["Repository"]] <- src
+    return(out)
+  }
 
-  } else if (identical(src, "github")) {
+  if (identical(src, "github")) {
     out[["Preferred_Source"]] <- "github"
+    return(out)
+  }
 
-  } else if (is_valid_github_url(src)) {
+  if (is_valid_github_url(src)) {
     out[["Preferred_Source"]]  <- "github"
     out[["Github_Username"]]   <- github_username_from_url(src)
     out[["Github_Repository"]] <- github_repo_from_url(src)
-    pkg <- pkg %||% out[["Github_Repository"]]
+    out[["Package"]]           <- out[["Package"]] %||% out[["Github_Repository"]]
+    return(out)
   }
 
-  if (length(out[["Preferred_Source"]]) == 0L) {
-    return(invalid())
-  }
+  handle_no_sources()
 
-  out
 }
 
 updateme_sources_get <- function(check = FALSE) {
-  opt <- getOption("updateme.sources")
+  opt <- as.list(getOption("updateme.sources"))
 
-  if (is.null(opt))
+  if (length(opt) == 0L)
     return(NULL)
 
-  as.list(opt) |>
+  names(opt) <- names(opt) %||% rep("", length(opt))
+
+  opt |>
     imap(updateme_sources_validate, throw = if (check) cli::cli_abort) |>
     compact() |>
     unname()
