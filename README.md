@@ -1,9 +1,14 @@
 # updateme
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/wurli/updateme/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/wurli/updateme/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 {updateme} modifies `library()` to tell you if your package is up to date when
 it gets loaded:
 
-![](updateme-demo.gif)
+<!-- GitHub link used b/c pkgdown doesn't like file path -->
+![](https://raw.githubusercontent.com/wurli/updateme/main/updateme-demo.gif)
 
 ## Installation
 

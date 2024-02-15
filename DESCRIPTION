@@ -9,7 +9,7 @@ Description: When a package is loaded, the source repository is checked for
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-URL: https://github.com/wurli/updateme
+URL: https://github.com/wurli/updateme, https://wurli.github.io/updateme/
 BugReports: https://github.com/wurli/updateme/issues
 Imports: 
     cachem,
