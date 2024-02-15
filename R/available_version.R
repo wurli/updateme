@@ -156,7 +156,7 @@ available_version_impl_git <- function(pkg, username, repo, type = c("github", "
   returned_version <- desc[["Version"]]
 
   list(
-    Source_Name = "GitHub",
+    Source_Name = switch(type, github = "GitHub", gitlab = "GitLab"),
     Source_URL = switch(type,
       github = github_url_make(username, repo),
       gitlab = gitlab_url_make(username, repo)
