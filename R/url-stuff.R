@@ -66,7 +66,7 @@ is_gitlab_url <- function(x) {
   grepl(x = x, paste0(
     "^\\s*https://gitlab\\.com/",
     .gitlab_username_pattern, "/", .gitlab_repo_pattern,
-    "\\s*$",
+    "\\s*$"
   ))
 }
 

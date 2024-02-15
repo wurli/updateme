@@ -25,6 +25,8 @@ test_that("package_installation_info works with no available sources", {
     Repository = NULL,
     Github_Username = NULL,
     Github_Repository = NULL,
+    Gitlab_Username   = NULL,
+    Gitlab_Repository = NULL,
     Remote_URL = NULL,
     Bioc_Views = NULL
   ))
@@ -59,6 +61,8 @@ test_that("package_installation_info works with repos packages", {
     Repository = "CRAN",
     Github_Username = NULL,
     Github_Repository = NULL,
+    Gitlab_Username   = NULL,
+    Gitlab_Repository = NULL,
     Remote_URL = NULL,
     Bioc_Views = NULL
   ))
@@ -93,6 +97,8 @@ test_that("package_installation_info works with desc URL field", {
     Repository = NULL,
     Github_Username = "foofyfooson",
     Github_Repository = "foo",
+    Gitlab_Username   = NULL,
+    Gitlab_Repository = NULL,
     Remote_URL = NULL,
     Bioc_Views = NULL
   ))
@@ -128,6 +134,8 @@ test_that("package_installation_info works with desc GithubRepo/GithubUsername f
     Repository = NULL,
     Github_Username = "foofyfooson",
     Github_Repository = "foo",
+    Gitlab_Username   = NULL,
+    Gitlab_Repository = NULL,
     Remote_URL = NULL,
     Bioc_Views = NULL
   ))
@@ -164,6 +172,8 @@ test_that("package_installation_info works with desc RemoteRepo/RemoteUsername f
     Repository = NULL,
     Github_Username = "foofyfooson",
     Github_Repository = "foo",
+    Gitlab_Username   = NULL,
+    Gitlab_Repository = NULL,
     Remote_URL = NULL,
     Bioc_Views = NULL
   ))
@@ -198,6 +208,8 @@ test_that("package_installation_info works with desc biocViews fields", {
     Repository = NULL,
     Github_Username = NULL,
     Github_Repository = NULL,
+    Gitlab_Username   = NULL,
+    Gitlab_Repository = NULL,
     Remote_URL = NULL,
     Bioc_Views = "Infrastructure"
   ))
@@ -234,6 +246,8 @@ test_that("package_installation_info works with multiple sources", {
     Repository = "CRAN",
     Github_Username = "foofyfooson",
     Github_Repository = "foo",
+    Gitlab_Username   = NULL,
+    Gitlab_Repository = NULL,
     Remote_URL = NULL,
     Bioc_Views = "Infrastructure"
   ))
