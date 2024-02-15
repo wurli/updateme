@@ -88,6 +88,23 @@ examples for more information.</p></dd>
 
 
     </div>
+    <div class="section level2">
+    <h2 id="private-repositories">Private Repositories<a class="anchor" aria-label="anchor" href="#private-repositories"></a></h2>
+    
+
+<p>updateme supports packages stored in private repositories on GitHub and
+GitLab. To get upstream package version from either, you should only
+have to configure a personal access token (PAT).</p><ul><li><p>For GitHub packages, updateme checks, in order:</p><ul><li><p>The <code>UPDATEME_GITHUB_PAT</code> environmental variable</p></li>
+<li><p>Any personal access tokens configured using <code><a href="https://gitcreds.r-lib.org/reference/gitcreds_get.html" class="external-link">gitcreds::gitcreds_set()</a></code></p></li>
+<li><p>The <code>GITHUB_PAT</code> environmental variable</p></li>
+<li><p>The <code>GITHUB_TOKEN</code> environmental variable</p></li>
+</ul></li>
+<li><p>For GitLab packages, updateme checks, in order:</p><ul><li><p>The <code>UPDATEME_GITLAB_PAT</code> environmental variable</p></li>
+<li><p>Any personal access tokens configured using <code><a href="https://gitcreds.r-lib.org/reference/gitcreds_get.html" class="external-link">gitcreds::gitcreds_set()</a></code></p></li>
+<li><p>The <code>GITLAB_PAT</code> environmental variable</p></li>
+<li><p>The <code>GITLAB_TOKEN</code> environmental variable</p></li>
+</ul></li>
+</ul></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
