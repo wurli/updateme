@@ -21,6 +21,23 @@
 #'   should apply to. If unnamed, the option will apply to all packages. See
 #'   examples for more information.
 #'
+#' @section Private Repositories:
+#' {updateme} supports packages stored in private repositories on GitHub and
+#' GitLab. To get upstream package version from either, you should only
+#' have to configure a personal access token (PAT).
+#'
+#' * For GitHub packages, {updateme} checks, in order:
+#'   * The `UPDATEME_GITHUB_PAT` environmental variable
+#'   * Any personal access tokens configured using [gitcreds::gitcreds_set()]
+#'   * The `GITHUB_PAT` environmental variable
+#'   * The `GITHUB_TOKEN` environmental variable
+#' * For GitLab packages, {updateme} checks, in order:
+#'   * The `UPDATEME_GITLAB_PAT` environmental variable
+#'   * Any personal access tokens configured using [gitcreds::gitcreds_set()]
+#'   * The `GITLAB_PAT` environmental variable
+#'   * The `GITLAB_TOKEN` environmental variable
+#'
+#'
 #' @return The result of setting
 #'   `options(updateme.sources = <new_options>)`
 #' @export

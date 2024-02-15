@@ -35,6 +35,7 @@ available_version <- function(desc_src) {
   src_type_defaults <- list(
     "repo"   = c("Package", "Repository"),
     "github" = c("Package", "Github_Username", "Github_Repository"),
+    "gitlab" = c("Package", "Gitlab_Username", "Gitlab_Repository"),
     "remote" = c(), # Not implemented yet
     "bioc"   = c()  # Not implemented yet
   )
@@ -58,7 +59,7 @@ available_version <- function(desc_src) {
   NULL
 }
 
-available_version_impl <- function(x, type = c("repo", "github", "remote", "bioc")) {
+available_version_impl <- function(x, type = c("repo", "github", "gitlab", "remote", "bioc")) {
   type <- match.arg(type)
   pkg <- x[["Package"]]
 
@@ -75,6 +76,14 @@ available_version_impl <- function(x, type = c("repo", "github", "remote", "bioc
       x[["Package"]],
       x[["Github_Username"]],
       x[["Github_Repository"]]
+    ))
+
+  # Packages from GitLab
+  if (identical(type, "gitlab"))
+    return(available_version_impl_gitlab(
+      x[["Package"]],
+      x[["Gitlab_Username"]],
+      x[["Gitlab_Repository"]]
     ))
 
   # TODO: Implement remote and bioc
@@ -117,48 +126,75 @@ available_version_impl_repo <- function(pkg, repo = NULL) {
   )
 }
 
-
 available_version_impl_github <- function(pkg, username, repo) {
-  response <- desc_from_github(username, repo, pkg)
+  available_version_impl_git(pkg, username, repo, "github")
+}
+
+available_version_impl_gitlab <- function(pkg, username, repo) {
+  available_version_impl_git(pkg, username, repo, "gitlab")
+}
+
+available_version_impl_git <- function(pkg, username, repo, type = c("github", "gitlab")) {
+  response <- desc_from_git(username, repo, pkg, type = type)
 
   if (is.null(response))
     return(response)
 
   desc <- parse_description(response)
-  github_name <- desc[["Package"]] %||% pkg
+  returned_name <- desc[["Package"]] %||% pkg
 
   # Handle cases when the returned DESCRIPTION isn't for the correct package
-  if (!identical(github_name, pkg)) {
+  if (!identical(returned_name, pkg)) {
     cli::cli_warn(c(
       "Incorrect repo specification for package {.pkg {pkg}}",
-      i = "Found DESCRIPTION file for package {.pkg {github_name}}",
+      i = "Found DESCRIPTION file for package {.pkg {returned_name}}",
       i = "Check the file at {.url {github_url_make(username, repo)}}"
     ))
     return(NULL)
   }
 
-  github_version <- desc[["Version"]]
+  returned_version <- desc[["Version"]]
 
   list(
     Source_Name = "GitHub",
-    Source_URL = paste0("https://github.com/", username, "/", repo),
-    Source_Version = github_version
+    Source_URL = switch(type,
+      github = github_url_make(username, repo),
+      gitlab = gitlab_url_make(username, repo)
+    ),
+    Source_Version = returned_version
   )
 
 }
 
-desc_from_github <- function(username, repo, pkg = repo, use_curl = TRUE) {
-  file_url <- paste0(
-    "https://raw.githubusercontent.com/",
-    username, "/", repo,
-    "/HEAD/DESCRIPTION"
+desc_from_git <- function(username, repo, pkg = repo, type = c("github", "gitlab")) {
+  type <- match.arg(type)
+
+  pat <- get_git_pat(type)
+
+  switch(type,
+    github = {
+      git_name <- "GitHub"
+      file_url <- paste0(
+        "https://raw.githubusercontent.com/",
+        username, "/", repo, "/HEAD/DESCRIPTION"
+      )
+      auth_header <- list(Authorization = paste("token", pat))
+    },
+    gitlab = {
+      git_name <- "GitLab"
+      file_url <- paste0(
+        "https://gitlab.com/api/v4/projects/",
+        utils::URLencode(paste0(username, "/", repo), reserved = TRUE),
+        "/repository/files/DESCRIPTION/raw"
+      )
+      auth_header <- list(`PRIVATE-TOKEN` = pat)
+    }
   )
 
   handle <- curl::new_handle()
-  pat <- get_github_pat()
 
   if (!is.null(pat))
-    curl::handle_setheaders(handle, Authorization = paste("token", get_github_pat()))
+    curl::handle_setheaders(handle, .list = auth_header)
 
   con <- curl::curl(file_url, handle = handle)
 
@@ -167,7 +203,7 @@ desc_from_github <- function(username, repo, pkg = repo, use_curl = TRUE) {
     error = function(e) {
       msg <- e$message
 
-      private_repo_msg <- if (is.null(get_github_pat()))
+      private_repo_msg <- if (is.null(pat))
         "If the repo is private, consider setting a PAT using {.fun gitcreds::gitcreds_set}"
 
       warning_msg <- if (grepl("404", msg)) {
@@ -176,11 +212,11 @@ desc_from_github <- function(username, repo, pkg = repo, use_curl = TRUE) {
           i = private_repo_msg,
           i = paste(
             "Is the repo private? Perhaps you need to configure",
-            "an {.topic [access token](updateme::`private-repos`)}."
+            "an {.topic [access token](updateme::updateme_set_sources)}."
           )
         )
       } else if (grepl("302", msg)) {
-        c(i = "{.val 302} response: not yet implemented") # TODO
+        c(i = "{.val 302} response: not yet implemented") # TODO: not exactly sure what this means
       } else if (grepl("403", msg)) {
         c(i = "{.val 403} error: access forbidden")
       } else {
@@ -188,7 +224,7 @@ desc_from_github <- function(username, repo, pkg = repo, use_curl = TRUE) {
       }
 
       cli::cli_warn(c(
-        "Failed attempting to get a package version for {.pkg {pkg}} from GitHub",
+        "Failed attempting to get a package version for {.pkg {pkg}} from {git_name}",
         warning_msg,
         i = "Error occurred accessing URL {.url {file_url}}"
       ))
@@ -198,21 +234,43 @@ desc_from_github <- function(username, repo, pkg = repo, use_curl = TRUE) {
   )
 }
 
-get_github_pat <- function() {
-  # 1. check special updateme env var
-  updateme_github_pat <- env_var("UPDATEME_GITHUB_PAT")
-  if (!is.null(updateme_github_pat))
-    return(updateme_github_pat)
+get_git_pat <- function(type = c("github", "gitlab")) {
+  type <- match.arg(type)
 
-  # 2. check w/{gitcreds} pkg
+  switch(type,
+    github = {
+      updateme_env_var <- "UPDATEME_GITHUB_PAT"
+      git_name         <- "GitHub"
+      git_url          <- "https://github.com"
+      fallback_envvars <- c("GITHUB_PAT", "GITHUB_TOKEN")
+    },
+    gitlab = {
+      updateme_env_var <- "UPDATEME_GITLAB_PAT"
+      git_name         <- "GitLab"
+      git_url          <- "https://gitlab.com"
+      fallback_envvars <- c("GITLAB_PAT", "GITLAB_TOKEN")
+    }
+  )
+
+  # 1. check special updateme env var
+  updateme_pat <- env_var(updateme_env_var)
+  if (!is.null(updateme_pat))
+    return(updateme_pat)
+
+  # 2. check using {gitcreds}
   if (is_installed("gitcreds")) {
     # gitcreds may error if no git installed, no creds set, etc
     try(silent = TRUE, {
-      pat <- gitcreds::gitcreds_get()[["password"]]
+      pat <- gitcreds::gitcreds_get(git_url)[["password"]]
       return(pat)
     })
   }
 
   # 3. Check standard env vars
-  env_var("GITHUB_PAT") %||% env_var("GITHUB_TOKEN")
+  for (envvar in fallback_envvars) {
+    pat <- env_var(envvar)
+    if (!is.null(pat))
+      return(pat)
+  }
+  NULL
 }
