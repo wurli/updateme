@@ -7,20 +7,9 @@ env_var <- function(x) {
   if (identical(out, "")) NULL else out
 }
 
-is_online <- function(use_curl = NULL) {
-  if (use_curl %||% is_installed("curl"))
-    return(!is.null(curl::nslookup("google.com", error = FALSE)))
-
-  tryCatch(
-    {
-      con <- url("https://google.com")
-      on.exit(close(con))
-      open(con)
-      TRUE
-    },
-    error = function(e) FALSE,
-    warning = function(w) FALSE
-  )
+# See testthat::skip_if_offline
+is_online <- function(host = "captive.apple.com") {
+  !is.null(curl::nslookup(host, error = FALSE))
 }
 
 list_replace <- function(x, ...) {

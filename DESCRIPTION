@@ -14,12 +14,12 @@ BugReports: https://github.com/wurli/updateme/issues
 Imports: 
     cachem,
     cli,
+    curl,
     memoise,
     rlang,
     utils
 RoxygenNote: 7.2.3
 Suggests: 
-    curl,
     gitcreds,
     knitr,
     rmarkdown,

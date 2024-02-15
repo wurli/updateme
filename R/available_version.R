@@ -118,51 +118,11 @@ available_version_impl_repo <- function(pkg, repo = NULL) {
 }
 
 
-available_version_impl_github <- function(pkg, username, repo, use_curl = TRUE) {
-  file_url <- paste0(
-    "https://raw.githubusercontent.com/",
-    username, "/", repo,
-    "/HEAD/DESCRIPTION"
-  )
-
-  if (use_curl %||% is_installed("curl")) {
-    handle <- curl::new_handle()
-    pat <- get_github_pat()
-    if (!is.null(pat))
-      curl::handle_setheaders(handle, Authorization = paste("token", get_github_pat()))
-    con <- curl::curl(file_url, handle = handle)
-  } else {
-    con <- url(file_url)
-  }
-
-  response <- tryCatch(
-    readLines(con, warn = FALSE),
-    error = function(e) {
-      msg <- e$message
-
-      private_repo_msg <- if (is.null(get_github_pat()))
-        "If the repo is private, consider setting a PAT using {.fun gitcreds::gitcreds_set}"
-
-      no_curl_msg <- if (!is_installed("curl"))
-        "Using private repos requires {.pkg curl} to be installed"
-
-      warning_msg <- if (grepl("404", msg))
-        c("{.val 404} error: DESCRIPTION not found", i = private_repo_msg, i = no_curl_msg)
-      else if (grepl("302", msg))
-        "{.val 302} response: not yet implemented" # TODO
-      else if (grepl("403", msg))
-        "{.val 403} error: access forbidden"
-      else
-        "DESCRIPTION file not accessible: {msg}"
-
-      cli::cli_warn(c(warning_msg, i = "Error occurred accessing URL {.url {file_url}}"))
-
-      NULL
-    }
-  )
+available_version_impl_github <- function(pkg, username, repo) {
+  response <- desc_from_github(username, repo)
 
   if (is.null(response))
-    return(NULL)
+    return(response)
 
   desc <- parse_description(response)
   github_name <- desc[["Package"]] %||% pkg
@@ -185,6 +145,53 @@ available_version_impl_github <- function(pkg, username, repo, use_curl = TRUE) 
     Source_Version = github_version
   )
 
+}
+
+desc_from_github <- function(username, repo, use_curl = TRUE) {
+  file_url <- paste0(
+    "https://raw.githubusercontent.com/",
+    username, "/", repo,
+    "/HEAD/DESCRIPTION"
+  )
+
+  handle <- curl::new_handle()
+  pat <- get_github_pat()
+
+  if (!is.null(pat))
+    curl::handle_setheaders(handle, Authorization = paste("token", get_github_pat()))
+
+  con <- curl::curl(file_url, handle = handle)
+
+  tryCatch(
+    readLines(con, warn = FALSE),
+    error = function(e) {
+      msg <- e$message
+
+      private_repo_msg <- if (is.null(get_github_pat()))
+        "If the repo is private, consider setting a PAT using {.fun gitcreds::gitcreds_set}"
+
+      warning_msg <- if (grepl("404", msg)) {
+        c(
+          "{.val 404} error: DESCRIPTION not found",
+          i = private_repo_msg,
+          i = no_curl_msg
+        )
+      } else if (grepl("302", msg)) {
+        "{.val 302} response: not yet implemented" # TODO
+      } else if (grepl("403", msg)) {
+        "{.val 403} error: access forbidden"
+      } else {
+        "DESCRIPTION file not accessible: {msg}"
+      }
+
+      cli::cli_warn(c(
+        warning_msg,
+        i = "Error occurred accessing URL {.url {file_url}}"
+      ))
+
+      NULL
+    }
+  )
 }
 
 get_github_pat <- function() {
