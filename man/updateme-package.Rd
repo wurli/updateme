@@ -6,6 +6,19 @@
 \alias{updateme-package}
 \title{updateme: Informative Messages About Outdated Packages}
 \description{
-More about what it does (maybe more than one line) Use four spaces when indenting paragraphs within the Description.
+When a package is loaded, the source repository is checked for new versions. A message is show in the console indicating whether the package is out of date.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/wurli/updateme}
+  \item \url{https://wurli.github.io/updateme/}
+  \item Report bugs at \url{https://github.com/wurli/updateme/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Jacob Scott \email{jscott2718@gmail.com}
+
 }
 \keyword{internal}

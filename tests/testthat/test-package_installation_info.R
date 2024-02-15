@@ -25,6 +25,8 @@ test_that("package_installation_info works with no available sources", {
     Repository = NULL,
     Github_Username = NULL,
     Github_Repository = NULL,
+    Gitlab_Username   = NULL,
+    Gitlab_Repository = NULL,
     Remote_URL = NULL,
     Bioc_Views = NULL
   ))
@@ -59,6 +61,8 @@ test_that("package_installation_info works with repos packages", {
     Repository = "CRAN",
     Github_Username = NULL,
     Github_Repository = NULL,
+    Gitlab_Username   = NULL,
+    Gitlab_Repository = NULL,
     Remote_URL = NULL,
     Bioc_Views = NULL
   ))
@@ -93,6 +97,8 @@ test_that("package_installation_info works with desc URL field", {
     Repository = NULL,
     Github_Username = "foofyfooson",
     Github_Repository = "foo",
+    Gitlab_Username   = NULL,
+    Gitlab_Repository = NULL,
     Remote_URL = NULL,
     Bioc_Views = NULL
   ))
@@ -128,6 +134,83 @@ test_that("package_installation_info works with desc GithubRepo/GithubUsername f
     Repository = NULL,
     Github_Username = "foofyfooson",
     Github_Repository = "foo",
+    Gitlab_Username   = NULL,
+    Gitlab_Repository = NULL,
+    Remote_URL = NULL,
+    Bioc_Views = NULL
+  ))
+
+})
+
+
+test_that("package_installation_info works with desc GitLab fields", {
+
+  withr::local_temp_libpaths()
+  libpath <- .libPaths()[1]
+
+  pkg_dir <- file.path(libpath, "foo")
+  dir.create(pkg_dir)
+
+  writeLines(
+    con = file.path(pkg_dir, "DESCRIPTION"),
+    paste(
+      sep = "\n",
+      'Package: foo',
+      'Type: Package',
+      'Version: 0.1.0',
+      'RemoteType: gitlab',
+      'RemoteUsername: foofyfooson',
+      'RemoteRepo: foo'
+    )
+  )
+
+  info <- package_installation_info("foo")
+
+  expect_identical(info, list(
+    Available_Sources = "gitlab",
+    Package = "foo",
+    Version_Installed = "0.1.0",
+    Repository = NULL,
+    Github_Username = NULL,
+    Github_Repository = NULL,
+    Gitlab_Username   = "foofyfooson",
+    Gitlab_Repository = "foo",
+    Remote_URL = NULL,
+    Bioc_Views = NULL
+  ))
+
+})
+
+test_that("package_installation_info can pare URL field", {
+
+  withr::local_temp_libpaths()
+  libpath <- .libPaths()[1]
+
+  pkg_dir <- file.path(libpath, "foo")
+  dir.create(pkg_dir)
+
+  writeLines(
+    con = file.path(pkg_dir, "DESCRIPTION"),
+    paste(
+      sep = "\n",
+      'Package: foo',
+      'Type: Package',
+      'Version: 0.1.0',
+      'URL: https://github.com/foofyfooson/foo, https://gitlab.com/foofyfooson/foo'
+    )
+  )
+
+  info <- package_installation_info("foo")
+
+  expect_identical(info, list(
+    Available_Sources = c("github", "gitlab"),
+    Package = "foo",
+    Version_Installed = "0.1.0",
+    Repository = NULL,
+    Github_Username   = "foofyfooson",
+    Github_Repository = "foo",
+    Gitlab_Username   = "foofyfooson",
+    Gitlab_Repository = "foo",
     Remote_URL = NULL,
     Bioc_Views = NULL
   ))
@@ -149,6 +232,7 @@ test_that("package_installation_info works with desc RemoteRepo/RemoteUsername f
       'Package: foo',
       'Type: Package',
       'Version: 0.1.0',
+      'RemoteType: github',
       'RemoteUsername: foofyfooson',
       'RemoteRepo: foo'
     )
@@ -163,6 +247,8 @@ test_that("package_installation_info works with desc RemoteRepo/RemoteUsername f
     Repository = NULL,
     Github_Username = "foofyfooson",
     Github_Repository = "foo",
+    Gitlab_Username   = NULL,
+    Gitlab_Repository = NULL,
     Remote_URL = NULL,
     Bioc_Views = NULL
   ))
@@ -197,6 +283,8 @@ test_that("package_installation_info works with desc biocViews fields", {
     Repository = NULL,
     Github_Username = NULL,
     Github_Repository = NULL,
+    Gitlab_Username   = NULL,
+    Gitlab_Repository = NULL,
     Remote_URL = NULL,
     Bioc_Views = "Infrastructure"
   ))
@@ -233,6 +321,8 @@ test_that("package_installation_info works with multiple sources", {
     Repository = "CRAN",
     Github_Username = "foofyfooson",
     Github_Repository = "foo",
+    Gitlab_Username   = NULL,
+    Gitlab_Repository = NULL,
     Remote_URL = NULL,
     Bioc_Views = "Infrastructure"
   ))

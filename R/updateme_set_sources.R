@@ -21,6 +21,23 @@
 #'   should apply to. If unnamed, the option will apply to all packages. See
 #'   examples for more information.
 #'
+#' @section Private Repositories:
+#' {updateme} supports packages stored in private repositories on GitHub and
+#' GitLab. To get upstream package version from either, you should only
+#' have to configure a personal access token (PAT).
+#'
+#' * For GitHub packages, {updateme} checks, in order:
+#'   * The `UPDATEME_GITHUB_PAT` environmental variable
+#'   * Any personal access tokens configured using [gitcreds::gitcreds_set()]
+#'   * The `GITHUB_PAT` environmental variable
+#'   * The `GITHUB_TOKEN` environmental variable
+#' * For GitLab packages, {updateme} checks, in order:
+#'   * The `UPDATEME_GITLAB_PAT` environmental variable
+#'   * Any personal access tokens configured using [gitcreds::gitcreds_set()]
+#'   * The `GITLAB_PAT` environmental variable
+#'   * The `GITLAB_TOKEN` environmental variable
+#'
+#'
 #' @return The result of setting
 #'   `options(updateme.sources = <new_options>)`
 #' @export
@@ -130,7 +147,7 @@ updateme_sources_validate <- function(src, pkg = NULL, throw = cli::cli_abort) {
     return(out)
   }
 
-  if (is_valid_github_url(src)) {
+  if (is_github_url(src)) {
     out[["Preferred_Source"]]  <- "github"
     out[["Github_Username"]]   <- github_username_from_url(src)
     out[["Github_Repository"]] <- github_repo_from_url(src)
@@ -158,31 +175,4 @@ updateme_sources_get <- function(check = FALSE) {
 
 is_valid_repo <- function(x) {
   x %in% names(getOption("repos"))
-}
-
-is_valid_github_url <- function(x) {
-  grepl("^\\s*https://github\\.com/[a-zA-Z0-9-]+/[a-zA-Z0-9_-]+\\s*$", x)
-}
-
-check_github_url <- function(x) {
-  if (!is_valid_github_url(x))
-    cli::cli_abort(c(
-      "Incorrectly formed GitHub URL {.url {x}}",
-      i = "URLs should have format {.val https://github.com/username/repo}"
-    ))
-  invisible(NULL)
-}
-
-github_username_from_url <- function(x) {
-  check_github_url(x)
-  sub("\\s*https://github\\.com/([a-zA-Z0-9-]+)/[a-zA-Z0-9_-]+\\s*$", "\\1", x)
-}
-
-github_repo_from_url <- function(x) {
-  check_github_url(x)
-  sub("\\s*https://github\\.com/[a-zA-Z0-9-]+/([a-zA-Z0-9_-]+)\\s*$", "\\1", x)
-}
-
-make_github_url <- function(username, repo) {
-  paste0("https://github.com/", username, "/", repo)
 }

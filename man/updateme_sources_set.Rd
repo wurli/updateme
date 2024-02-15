@@ -32,6 +32,29 @@ This function is a helper for setting the \code{"updateme.sources"}
 global option. It provides a user-friendly interface and validation of the
 options you set.
 }
+\section{Private Repositories}{
+
+{updateme} supports packages stored in private repositories on GitHub and
+GitLab. To get upstream package version from either, you should only
+have to configure a personal access token (PAT).
+\itemize{
+\item For GitHub packages, {updateme} checks, in order:
+\itemize{
+\item The \code{UPDATEME_GITHUB_PAT} environmental variable
+\item Any personal access tokens configured using \code{\link[gitcreds:gitcreds_get]{gitcreds::gitcreds_set()}}
+\item The \code{GITHUB_PAT} environmental variable
+\item The \code{GITHUB_TOKEN} environmental variable
+}
+\item For GitLab packages, {updateme} checks, in order:
+\itemize{
+\item The \code{UPDATEME_GITLAB_PAT} environmental variable
+\item Any personal access tokens configured using \code{\link[gitcreds:gitcreds_get]{gitcreds::gitcreds_set()}}
+\item The \code{GITLAB_PAT} environmental variable
+\item The \code{GITLAB_TOKEN} environmental variable
+}
+}
+}
+
 \examples{
 if (FALSE) {
 
