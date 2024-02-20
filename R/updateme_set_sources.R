@@ -17,8 +17,9 @@
 #'       `"https://github.com/wurli/updateme"`: the latest version *for this
 #'       particular package* will be taken from this project
 #'
-#'   -  `NULL` or `NA`: {updateme} will not attempt to fetch new versions of
-#'      this package. Note that `NULL` or `NA` inputs must always be named.
+#'   -  `NULL` or `NA`: {updateme} will not attempt to query new versions.
+#'      Note that `NULL` or `NA` inputs must always be named (i.e. you must
+#'      specify this 'per package').
 #'
 #'   If arguments are named, names should indicate package which the option
 #'   should apply to. If unnamed, the option will apply to all packages. See
