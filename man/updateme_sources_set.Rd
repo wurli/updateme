@@ -17,9 +17,9 @@ this source, if available
 \item A URL pointing to a GitHub/GitLab repo, e.g.
 \code{"https://github.com/wurli/updateme"}: the latest version \emph{for this
 particular package} will be taken from this project
-\item \code{NULL} or \code{NA}: {updateme} will not attempt to query new versions.
-Note that \code{NULL} or \code{NA} inputs must always be named (i.e. you must
-specify this 'per package').
+\item \code{NULL}: {updateme} will not attempt to query new versions.
+Note that \code{NULL} inputs must always be named (i.e. you must specify this
+'per package').
 }
 
 If arguments are named, names should indicate package which the option

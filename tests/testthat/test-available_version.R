@@ -42,6 +42,4 @@ test_that("available_version() respects updateme.sources", {
   updateme_sources_set(updateme.testpkg = NULL)
   expect_identical(available_version(info), NULL)
 
-  updateme_sources_set(updateme.testpkg = NA)
-  expect_identical(available_version(info), NULL)
 })

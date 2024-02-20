@@ -17,9 +17,9 @@
 #'       `"https://github.com/wurli/updateme"`: the latest version *for this
 #'       particular package* will be taken from this project
 #'
-#'   -  `NULL` or `NA`: {updateme} will not attempt to query new versions.
-#'      Note that `NULL` or `NA` inputs must always be named (i.e. you must
-#'      specify this 'per package').
+#'   -  `NULL`: {updateme} will not attempt to query new versions.
+#'      Note that `NULL` inputs must always be named (i.e. you must specify this
+#'      'per package').
 #'
 #'   If arguments are named, names should indicate package which the option
 #'   should apply to. If unnamed, the option will apply to all packages. See
@@ -119,13 +119,13 @@ updateme_sources_validate <- function(src, pkg = NULL, throw = cli::cli_abort) {
         " " = '2. One of {.code names(getOption("repos"))}',
         " " = "3. The URL of a specific GitHub repository, e.g. {.url https://github.com/wurli/updateme}",
         " " = "4. The URL of a specific GitLab repository, e.g. {.url https://gitlab.com/r-packages/yum}",
-        " " = "5. {.val NULL} or {.val NA} to turn {.pkg updateme} off for a package"
+        " " = "5. {.val NULL} to turn {.pkg updateme} off for a package"
       ))
     }
     NULL
   }
 
-  src_ok <- is.character(src) || is.null(src) || any(is.na(src))
+  src_ok <- is.character(src) || is.null(src)
   pkg_ok <- is.character(pkg) || is.null(pkg)
 
   if (!src_ok || !pkg_ok) {
