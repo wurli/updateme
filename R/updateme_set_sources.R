@@ -17,6 +17,9 @@
 #'       `"https://github.com/wurli/updateme"`: the latest version *for this
 #'       particular package* will be taken from this project
 #'
+#'   -  `NULL` or `NA`: {updateme} will not attempt to fetch new versions of
+#'      this package. Note that `NULL` or `NA` inputs must always be named.
+#'
 #'   If arguments are named, names should indicate package which the option
 #'   should apply to. If unnamed, the option will apply to all packages. See
 #'   examples for more information.
@@ -114,13 +117,14 @@ updateme_sources_validate <- function(src, pkg = NULL, throw = cli::cli_abort) {
         " " = "1. {.val github}/{.val gitlab}, to check the version on GitHub/GitLab if possible",
         " " = '2. One of {.code names(getOption("repos"))}',
         " " = "3. The URL of a specific GitHub repository, e.g. {.url https://github.com/wurli/updateme}",
-        " " = "4. The URL of a specific GitLab repository, e.g. {.url https://gitlab.com/r-packages/yum}"
+        " " = "4. The URL of a specific GitLab repository, e.g. {.url https://gitlab.com/r-packages/yum}",
+        " " = "5. {.val NULL} or {.val NA} to turn {.pkg updateme} off for a package"
       ))
     }
     NULL
   }
 
-  src_ok <- is.character(src) || is.null(src)
+  src_ok <- is.character(src) || is.null(src) || any(is.na(src))
   pkg_ok <- is.character(pkg) || is.null(pkg)
 
   if (!src_ok || !pkg_ok) {
@@ -129,6 +133,16 @@ updateme_sources_validate <- function(src, pkg = NULL, throw = cli::cli_abort) {
 
   if (pkg == "")
     pkg <- NULL
+
+  if (any(is.na(src)))
+    src <- NULL
+
+  if (is.null(src) && is.null(pkg)) {
+    throw(call = caller_call(6), c(
+      "Invalid package source",
+      i = "All {.val NULL} and {.val NA} arguments must be named"
+    ))
+  }
 
   out <- list(
     Preferred_Source  = NULL,
@@ -140,6 +154,11 @@ updateme_sources_validate <- function(src, pkg = NULL, throw = cli::cli_abort) {
     Remote_URL        = NULL,
     Bioc_Views        = NULL
   )
+
+  if (is.null(src)) {
+    out[["Preferred_Source"]] <- .updateme_skip
+    return(out)
+  }
 
   if (is_valid_repo(src)) {
     out[["Preferred_Source"]] <- "repo"
@@ -165,11 +184,14 @@ updateme_sources_validate <- function(src, pkg = NULL, throw = cli::cli_abort) {
     out[["Gitlab_Username"]]   <- gitlab_username_from_url(src)
     out[["Gitlab_Repository"]] <- gitlab_repo_from_url(src)
     out[["Package"]]           <- out[["Package"]] %||% out[["Gitlab_Repository"]]
+    return(out)
   }
 
   handle_no_sources()
 
 }
+
+.updateme_skip <- structure("updateme_skip", class = c("updateme_skip", "character"))
 
 updateme_sources_get <- function(check = FALSE) {
   opt <- as.list(getOption("updateme.sources"))

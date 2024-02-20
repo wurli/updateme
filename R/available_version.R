@@ -21,10 +21,14 @@ available_version <- function(desc_src) {
 
   # Check each of the sources specified in getOption("updateme.sources")
   for (src in preferred_srcs) {
+    if (identical(src[["Preferred_Source"]], .updateme_skip))
+      return(invisible(NULL))
+
     vn <- available_version_impl(
       list_replace(desc_src, !!!compact(src)),
       type = src[["Preferred_Source"]]
     )
+
     if (!is.null(vn))
       return(vn)
   }
