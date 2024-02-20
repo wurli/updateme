@@ -40,7 +40,11 @@
 #'
 #' @return The result of setting
 #'   `options(updateme.sources = <new_options>)`
+#'
 #' @export
+#'
+#' @seealso [updateme_on()] and [updateme_off()] to disable {updateme} for all
+#'   packages
 #'
 #' @examples
 #' if (FALSE) {

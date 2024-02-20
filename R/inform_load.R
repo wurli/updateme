@@ -1,5 +1,9 @@
 inform_load <- function(pkg) {
 
+  if (!is_interactive() || !updateme_is_on()) {
+    return(invisible(NULL))
+  }
+
   installation_info <- package_installation_info(pkg)
 
   installed_version <- packageVersion(pkg)
