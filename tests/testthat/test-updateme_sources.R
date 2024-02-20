@@ -37,6 +37,10 @@ test_that("updateme_sources_set() sets options correctly", {
                          list("CRAN", dplyr = "github", "rlib")
   )
   expect_equal(
+    updateme_sources_set_impl("CRAN", dplyr = "gitlab", "rlib"),
+                         list("CRAN", dplyr = "gitlab", "rlib")
+  )
+  expect_equal(
     updateme_sources_set_impl("rlib", "CRAN"),
                     dots_list("rlib", "CRAN")
   )
@@ -107,6 +111,20 @@ test_that("updateme_sources_get() works", {
       Preferred_Source = "github",
       Package = NULL,
       Source_Name = "github",
+      Repository = NULL,
+      Github_Username = NULL,
+      Github_Repository = NULL,
+      Remote_URL = NULL,
+      Bioc_Views = NULL
+    )
+  ))
+
+  options(updateme.sources = list("gitlab"))
+  expect_identical(updateme_sources_get(), list(
+    list(
+      Preferred_Source = "gitlab",
+      Package = NULL,
+      Source_Name = "gitlab",
       Repository = NULL,
       Github_Username = NULL,
       Github_Repository = NULL,

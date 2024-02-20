@@ -9,12 +9,12 @@ updateme_sources_set(...)
 \arguments{
 \item{...}{Named or unnamed arguments. Values should be either:
 \itemize{
-\item \code{"github"}: new versions will be found from the package development
-version on GitHub, if a repo can be identified using the package
-\code{DESCRIPTION}
+\item \code{"github"}/\code{"gitlab"}: new versions will be found from the package
+development version on GitHub/GitLab, if a repo can be identified using
+the package \code{DESCRIPTION}
 \item One of \code{names(getOption("repo"))}: latest versions will be taken from
 this source, if available
-\item A URL pointing to a GitHub repo, e.g.
+\item A URL pointing to a GitHub/GitLab repo, e.g.
 \code{"https://github.com/wurli/updateme"}: the latest version \emph{for this
 particular package} will be taken from this project
 }

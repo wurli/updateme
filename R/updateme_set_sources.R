@@ -6,14 +6,14 @@
 #'
 #' @param ... Named or unnamed arguments. Values should be either:
 #'
-#'   -   `"github"`: new versions will be found from the package development
-#'       version on GitHub, if a repo can be identified using the package
-#'       `DESCRIPTION`
+#'   -   `"github"`/`"gitlab"`: new versions will be found from the package
+#'       development version on GitHub/GitLab, if a repo can be identified using
+#'       the package `DESCRIPTION`
 #'
 #'   -   One of `names(getOption("repo"))`: latest versions will be taken from
 #'       this source, if available
 #'
-#'   -   A URL pointing to a GitHub repo, e.g.
+#'   -   A URL pointing to a GitHub/GitLab repo, e.g.
 #'       `"https://github.com/wurli/updateme"`: the latest version *for this
 #'       particular package* will be taken from this project
 #'
@@ -107,9 +107,10 @@ updateme_sources_validate <- function(src, pkg = NULL, throw = cli::cli_abort) {
       throw(call = caller_call(6), c(
         "Invalid package source {.val {src}}.",
         "i" = "Package sources must be either:",
-        " " = "1. {.val github}, to check the version on GitHub if possible",
+        " " = "1. {.val github}/{.val gitlab}, to check the version on GitHub/GitLab if possible",
         " " = '2. One of {.code names(getOption("repos"))}',
-        " " = "3. The URL of a specific GitHub repository, e.g. {.url https://github.com/wurli/updateme}"
+        " " = "3. The URL of a specific GitHub repository, e.g. {.url https://github.com/wurli/updateme}",
+        " " = "4. The URL of a specific GitLab repository, e.g. {.url https://gitlab.com/r-packages/yum}"
       ))
     }
     NULL
@@ -142,8 +143,8 @@ updateme_sources_validate <- function(src, pkg = NULL, throw = cli::cli_abort) {
     return(out)
   }
 
-  if (identical(src, "github")) {
-    out[["Preferred_Source"]] <- "github"
+  if (identical(src, "github") || identical(src, "gitlab")) {
+    out[["Preferred_Source"]] <- src
     return(out)
   }
 
@@ -153,6 +154,13 @@ updateme_sources_validate <- function(src, pkg = NULL, throw = cli::cli_abort) {
     out[["Github_Repository"]] <- github_repo_from_url(src)
     out[["Package"]]           <- out[["Package"]] %||% out[["Github_Repository"]]
     return(out)
+  }
+
+  if (is_gitlab_url(src)) {
+    out[["Preferred_Source"]]  <- "gitlab"
+    out[["Gitlab_Username"]]   <- gitlab_username_from_url(src)
+    out[["Gitlab_Repository"]] <- gitlab_repo_from_url(src)
+    out[["Package"]]           <- out[["Package"]] %||% out[["Gitlab_Repository"]]
   }
 
   handle_no_sources()
