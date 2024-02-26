@@ -1,0 +1,33 @@
+Package: BiocGenerics
+Title: S4 generic functions used in Bioconductor
+Description: The package defines many S4 generic functions used in Bioconductor.
+biocViews: Infrastructure
+URL: https://bioconductor.org/packages/BiocGenerics
+BugReports: https://github.com/Bioconductor/BiocGenerics/issues
+Version: 0.48.1
+License: Artistic-2.0
+Encoding: UTF-8
+Author: The Bioconductor Dev Team
+Maintainer: Hervé Pagès <hpages.on.github@gmail.com>
+  Depends: R (>= 4.0.0), methods, utils, graphics, stats
+Imports: methods, utils, graphics, stats
+Suggests: Biobase, S4Vectors, IRanges, GenomicRanges, DelayedArray, Biostrings,
+Rsamtools, AnnotationDbi, affy, affyPLM, DESeq2, flowClust, MSnbase, annotate,
+RUnit
+Collate: S3-classes-as-S4-classes.R utils.R normarg-utils.R replaceSlots.R aperm.R .....
+git_url: https://git.bioconductor.org/packages/BiocGenerics
+git_branch: RELEASE_3_18
+git_last_commit: 5fd6dfe
+git_last_commit_date: 2023-10-31
+Date/Publication: 2023-11-02
+NeedsCompilation: no
+Packaged: 2023-11-02 22:50:37 UTC; biocbuild
+Built: R 4.3.1; ; 2023-11-04 16:43:46 UTC; unix
+RemoteType: bioc
+RemotePkgRef: bioc::BiocGenerics
+RemoteRef: bioc::BiocGenerics
+RemoteRepos: https://bioconductor.org/packages/3.18/bioc
+RemotePkgPlatform: aarch64-apple-darwin20
+RemoteSha: 0.48.1
+
+-- File: /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/library/BiocGenerics/Meta/package.rds

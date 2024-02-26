@@ -26,9 +26,9 @@
 #'   examples for more information.
 #'
 #' @section Private Repositories:
-#' {updateme} supports packages stored in private repositories on GitHub and
-#' GitLab. To get upstream package version from either, you should only
-#' have to configure a personal access token (PAT).
+#' {updateme} supports packages installed from private repositories on GitHub
+#' and GitLab. To get upstream package version from either, you should only have
+#' to configure a personal access token (PAT):
 #'
 #' * For GitHub packages, {updateme} checks, in order:
 #'   * The `UPDATEME_GITHUB_PAT` environmental variable
