@@ -10,12 +10,6 @@
     <loc>https://wurli.github.io/updateme/LICENSE.html</loc>
   </url>
   <url>
-    <loc>https://wurli.github.io/updateme/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://wurli.github.io/updateme/articles/package-sources.html</loc>
-  </url>
-  <url>
     <loc>https://wurli.github.io/updateme/authors.html</loc>
   </url>
   <url>
@@ -26,6 +20,9 @@
   </url>
   <url>
     <loc>https://wurli.github.io/updateme/reference/updateme-package.html</loc>
+  </url>
+  <url>
+    <loc>https://wurli.github.io/updateme/reference/updateme_on.html</loc>
   </url>
   <url>
     <loc>https://wurli.github.io/updateme/reference/updateme_sources_set.html</loc>

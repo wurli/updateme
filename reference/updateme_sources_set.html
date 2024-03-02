@@ -25,12 +25,6 @@ options you set.'><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax
       <ul class="navbar-nav me-auto"><li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
-<li class="nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/package-sources.html">package-sources</a>
-  </div>
-</li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
@@ -66,14 +60,17 @@ options you set.</p>
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>...</dt>
-<dd><p>Named or unnamed arguments. Values should be either:</p><ul><li><p><code>"github"</code>: new versions will be found from the package development
-version on GitHub, if a repo can be identified using the package
-<code>DESCRIPTION</code></p></li>
+<dd><p>Named or unnamed arguments. Values should be either:</p><ul><li><p><code>"github"</code>/<code>"gitlab"</code>: new versions will be found from the package
+development version on GitHub/GitLab, if a repo can be identified using
+the package <code>DESCRIPTION</code></p></li>
 <li><p>One of <code>names(getOption("repo"))</code>: latest versions will be taken from
 this source, if available</p></li>
-<li><p>A URL pointing to a GitHub repo, e.g.
+<li><p>A URL pointing to a GitHub/GitLab repo, e.g.
 <code>"https://github.com/wurli/updateme"</code>: the latest version <em>for this
 particular package</em> will be taken from this project</p></li>
+<li><p><code>NULL</code>: updateme will not attempt to query new versions.
+Note that <code>NULL</code> inputs must always be named (i.e. you must specify this
+'per package').</p></li>
 </ul><p>If arguments are named, names should indicate package which the option
 should apply to. If unnamed, the option will apply to all packages. See
 examples for more information.</p></dd>
@@ -105,6 +102,11 @@ have to configure a personal access token (PAT).</p><ul><li><p>For GitHub packag
 <li><p>The <code>GITLAB_TOKEN</code> environmental variable</p></li>
 </ul></li>
 </ul></div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="updateme_on.html">updateme_on()</a></code> and <code><a href="updateme_on.html">updateme_off()</a></code> to disable updateme for all
+packages</p></div>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
