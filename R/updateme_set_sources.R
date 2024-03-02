@@ -6,25 +6,29 @@
 #'
 #' @param ... Named or unnamed arguments. Values should be either:
 #'
-#'   -   `"github"`: new versions will be found from the package development
-#'       version on GitHub, if a repo can be identified using the package
-#'       `DESCRIPTION`
+#'   -   `"github"`/`"gitlab"`: new versions will be found from the package
+#'       development version on GitHub/GitLab, if a repo can be identified using
+#'       the package `DESCRIPTION`
 #'
 #'   -   One of `names(getOption("repo"))`: latest versions will be taken from
 #'       this source, if available
 #'
-#'   -   A URL pointing to a GitHub repo, e.g.
+#'   -   A URL pointing to a GitHub/GitLab repo, e.g.
 #'       `"https://github.com/wurli/updateme"`: the latest version *for this
 #'       particular package* will be taken from this project
+#'
+#'   -  `NULL`: {updateme} will not attempt to query new versions.
+#'      Note that `NULL` inputs must always be named (i.e. you must specify this
+#'      'per package').
 #'
 #'   If arguments are named, names should indicate package which the option
 #'   should apply to. If unnamed, the option will apply to all packages. See
 #'   examples for more information.
 #'
 #' @section Private Repositories:
-#' {updateme} supports packages stored in private repositories on GitHub and
-#' GitLab. To get upstream package version from either, you should only
-#' have to configure a personal access token (PAT).
+#' {updateme} supports packages installed from private repositories on GitHub
+#' and GitLab. To get upstream package version from either, you should only have
+#' to configure a personal access token (PAT):
 #'
 #' * For GitHub packages, {updateme} checks, in order:
 #'   * The `UPDATEME_GITHUB_PAT` environmental variable
@@ -40,7 +44,11 @@
 #'
 #' @return The result of setting
 #'   `options(updateme.sources = <new_options>)`
+#'
 #' @export
+#'
+#' @seealso [updateme_on()] and [updateme_off()] to disable {updateme} for all
+#'   packages
 #'
 #' @examples
 #' if (FALSE) {
@@ -107,9 +115,11 @@ updateme_sources_validate <- function(src, pkg = NULL, throw = cli::cli_abort) {
       throw(call = caller_call(6), c(
         "Invalid package source {.val {src}}.",
         "i" = "Package sources must be either:",
-        " " = "1. {.val github}, to check the version on GitHub if possible",
+        " " = "1. {.val github}/{.val gitlab}, to check the version on GitHub/GitLab if possible",
         " " = '2. One of {.code names(getOption("repos"))}',
-        " " = "3. The URL of a specific GitHub repository, e.g. {.url https://github.com/wurli/updateme}"
+        " " = "3. The URL of a specific GitHub repository, e.g. {.url https://github.com/wurli/updateme}",
+        " " = "4. The URL of a specific GitLab repository, e.g. {.url https://gitlab.com/r-packages/yum}",
+        " " = "5. {.val NULL} to turn {.pkg updateme} off for a package"
       ))
     }
     NULL
@@ -125,6 +135,16 @@ updateme_sources_validate <- function(src, pkg = NULL, throw = cli::cli_abort) {
   if (pkg == "")
     pkg <- NULL
 
+  if (any(is.na(src)))
+    src <- NULL
+
+  if (is.null(src) && is.null(pkg)) {
+    throw(call = caller_call(6), c(
+      "Invalid package source",
+      i = "All {.val NULL} and {.val NA} arguments must be named"
+    ))
+  }
+
   out <- list(
     Preferred_Source  = NULL,
     Package           = pkg,
@@ -136,14 +156,19 @@ updateme_sources_validate <- function(src, pkg = NULL, throw = cli::cli_abort) {
     Bioc_Views        = NULL
   )
 
+  if (is.null(src)) {
+    out[["Preferred_Source"]] <- .updateme_skip
+    return(out)
+  }
+
   if (is_valid_repo(src)) {
     out[["Preferred_Source"]] <- "repo"
     out[["Repository"]] <- src
     return(out)
   }
 
-  if (identical(src, "github")) {
-    out[["Preferred_Source"]] <- "github"
+  if (identical(src, "github") || identical(src, "gitlab")) {
+    out[["Preferred_Source"]] <- src
     return(out)
   }
 
@@ -155,9 +180,19 @@ updateme_sources_validate <- function(src, pkg = NULL, throw = cli::cli_abort) {
     return(out)
   }
 
+  if (is_gitlab_url(src)) {
+    out[["Preferred_Source"]]  <- "gitlab"
+    out[["Gitlab_Username"]]   <- gitlab_username_from_url(src)
+    out[["Gitlab_Repository"]] <- gitlab_repo_from_url(src)
+    out[["Package"]]           <- out[["Package"]] %||% out[["Gitlab_Repository"]]
+    return(out)
+  }
+
   handle_no_sources()
 
 }
+
+.updateme_skip <- structure("updateme_skip", class = c("updateme_skip", "character"))
 
 updateme_sources_get <- function(check = FALSE) {
   opt <- as.list(getOption("updateme.sources"))

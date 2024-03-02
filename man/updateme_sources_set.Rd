@@ -9,14 +9,17 @@ updateme_sources_set(...)
 \arguments{
 \item{...}{Named or unnamed arguments. Values should be either:
 \itemize{
-\item \code{"github"}: new versions will be found from the package development
-version on GitHub, if a repo can be identified using the package
-\code{DESCRIPTION}
+\item \code{"github"}/\code{"gitlab"}: new versions will be found from the package
+development version on GitHub/GitLab, if a repo can be identified using
+the package \code{DESCRIPTION}
 \item One of \code{names(getOption("repo"))}: latest versions will be taken from
 this source, if available
-\item A URL pointing to a GitHub repo, e.g.
+\item A URL pointing to a GitHub/GitLab repo, e.g.
 \code{"https://github.com/wurli/updateme"}: the latest version \emph{for this
 particular package} will be taken from this project
+\item \code{NULL}: {updateme} will not attempt to query new versions.
+Note that \code{NULL} inputs must always be named (i.e. you must specify this
+'per package').
 }
 
 If arguments are named, names should indicate package which the option
@@ -86,4 +89,8 @@ if (FALSE) {
   )
 }
 
+}
+\seealso{
+\code{\link[=updateme_on]{updateme_on()}} and \code{\link[=updateme_off]{updateme_off()}} to disable {updateme} for all
+packages
 }

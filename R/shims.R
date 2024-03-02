@@ -49,11 +49,8 @@ shim_library_3_1 <- function(package,
       verbose = verbose
     )
 
-    if (is_interactive())
-      inform_load(package)
-
+    inform_load(package)
     handle_conflicted()
-
     invisible(out)
 
   } else if (!missing(help)) {
@@ -104,11 +101,8 @@ shim_library_3_6 <- function(package,
       attach.required = attach.required
     )
 
-    if (is_interactive())
-      inform_load(package)
-
+    inform_load(package)
     handle_conflicted()
-
     invisible(out)
 
   } else if (!missing(help)) {
@@ -144,11 +138,8 @@ shim_require_3_1 <- function(package,
     character.only = TRUE
   )
 
-  if (is_interactive())
-    inform_load(package)
-
+  inform_load(package)
   handle_conflicted()
-
   invisible(out)
 }
 
@@ -178,11 +169,8 @@ shim_require_3_6 <- function(package,
     attach.required = attach.required
   )
 
-  if (is_interactive())
-    inform_load(package)
-
+  inform_load(package)
   handle_conflicted()
-
   invisible(out)
 }
 

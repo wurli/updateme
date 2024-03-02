@@ -1,10 +1,15 @@
-inform_load <- function(pkg) {
+inform_load <- function(pkg, inform_if_ahead = NULL) {
+
+  if (!is_interactive() || !updateme_is_on()) {
+    return(invisible(NULL))
+  }
 
   installation_info <- package_installation_info(pkg)
 
   installed_version <- packageVersion(pkg)
   available         <- available_version(installation_info)
   repo_version      <- available[["Source_Version"]]
+  inform_if_ahead   <- inform_if_ahead %||% grepl("^Bioc", available[["Source_Name"]])
 
   new_version_found <- !is.null(repo_version)
 
@@ -31,15 +36,17 @@ inform_load <- function(pkg) {
   src_name <- available[["Source_Name"]]
   src_url  <- available[["Source_URL"]]
 
-  extra_info <- if (new_version_found && currentness %in% c("outdated", "unknown")) {
-    cli::col_grey(cli::style_italic(
-      " (", repo_version, " now available from ",
-      if (is.null(src_url))
-        src_name
-      else
-        cli::format_inline("{.href [{src_name}]({src_url})}"),
-      ")"
-    ))
+  extra_info <- if (new_version_found && currentness %in% c("outdated", "unknown", "ahead")) {
+    src_pretty <- if (is.null(src_url))
+      src_name
+    else
+      cli::format_inline("{.href [{src_name}]({src_url})}")
+
+    cli::col_grey(cli::style_italic(cli::format_inline(switch(currentness,
+      outdated = ,
+      unknown  = " ({repo_version} now available from {src_pretty})",
+      ahead    = " ({repo_version} is the latest version on {src_pretty})"
+    ))))
   }
 
   cli::cli_alert_info(paste0(
