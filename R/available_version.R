@@ -38,10 +38,10 @@ available_version <- function(desc_src) {
   # ! Order is important
   src_type_defaults <- list(
     "repo"   = c("Package", "Repository"),
+    "bioc"   = c("Package"),
     "github" = c("Package", "Github_Username", "Github_Repository"),
     "gitlab" = c("Package", "Gitlab_Username", "Gitlab_Repository"),
-    "remote" = c(), # Not implemented yet
-    "bioc"   = c()  # Not implemented yet
+    "remote" = c() # Not implemented yet
   )
 
   for (src_type in names(src_type_defaults)) {
@@ -74,6 +74,10 @@ available_version_impl <- function(x, type = c("repo", "github", "gitlab", "remo
   if (identical(type, "repo"))
     return(available_version_impl_repo(pkg, x[["Repository"]]))
 
+  # Packages from Bioconductor
+  if (identical(type, "bioc"))
+    return(available_version_impl_bioc(pkg, version = bioc_version()))
+
   # Packages from GitHub
   if (identical(type, "github"))
     return(available_version_impl_github(
@@ -90,11 +94,10 @@ available_version_impl <- function(x, type = c("repo", "github", "gitlab", "remo
       x[["Gitlab_Repository"]]
     ))
 
-  # TODO: Implement remote and bioc
   NULL
 }
 
-available_version_impl_repo <- function(pkg, repo = NULL) {
+available_version_impl_repo <- function(pkg, repo = NULL, repo_alias = NULL) {
   repos_option <- getOption("repos")
 
   if (is.null(repo)) {
@@ -113,20 +116,33 @@ available_version_impl_repo <- function(pkg, repo = NULL) {
     pkg_data <- pkg_data[1, , drop = FALSE]
   }
 
-  # The last bit of the repo URL can contain some extra stuff - remove this so
-  # we can detect whether it's the same as a repo from the `repos` global option
-  pattern <- pkg_data[["Repository"]] |>
-    sub(x = _, "/R/.+$", "") |>
-    sub(x = _, "/src/contrib$", "")
+  if (is.null(repo_alias)) {
+    # The last bit of the repo URL can contain some extra stuff - remove this so
+    # we can detect whether it's the same as a repo from the `repos` global option
+    pattern <- pkg_data[["Repository"]] |>
+      sub(x = _, "/R/.+$", "") |>
+      sub(x = _, "/src/contrib$", "")
 
-  repo_alias <- names(repos_option)[grepl(pattern, repos_option, fixed = TRUE)]
-  if (length(repo_alias) == 0L || identical(repo_alias, ""))
-    repo_alias <- repo
+    repo_alias <- names(repos_option)[grepl(pattern, repos_option, fixed = TRUE)]
+    if (length(repo_alias) == 0L || identical(repo_alias, ""))
+      repo_alias <- repo
+  }
 
   list(
     Source_Name = repo_alias,
     Source_URL = repo,
     Source_Version = maybe_as_version(pkg_data[["Version"]])
+  )
+}
+
+available_version_impl_bioc <- function(pkg, version = bioc_version()) {
+  if (!inherits(version, "numeric_version"))
+    return(NULL)
+
+  available_version_impl_repo(
+    pkg,
+    bioc_repo(version),
+    paste("Bioconductor", version)
   )
 }
 
