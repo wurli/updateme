@@ -42,3 +42,10 @@ with_timeout <- function(expr, time = Inf){
   )
 }
 
+str_extract_all <- function(x, pattern, invert = FALSE, perl = TRUE) {
+  regmatches(x, gregexpr(pattern, x, perl = perl), invert)[[1]]
+}
+
+installed_version <- function(pkg) {
+  tryCatch(packageVersion(pkg), error = function(e) NULL)
+}

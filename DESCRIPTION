@@ -4,7 +4,7 @@ Title: Informative Messages About Outdated Packages
 Version: 0.1.0
 Authors@R: person("Jacob", "Scott", email = "jscott2718@gmail.com", role = c("aut", "cre"))
 Description: When a package is loaded, the source repository is checked for 
-    new versions. A message is show in the console indicating whether the 
+    new versions and a message is show in the console indicating whether the 
     package is out of date.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -13,7 +13,7 @@ URL: https://github.com/wurli/updateme, https://wurli.github.io/updateme/
 BugReports: https://github.com/wurli/updateme/issues
 Imports: 
     cachem,
-    cli,
+    cli (>= 3.6.0),
     curl,
     memoise,
     rlang,

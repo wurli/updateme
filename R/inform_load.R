@@ -1,27 +1,52 @@
-inform_load <- function(pkg, inform_if_ahead = NULL) {
+inform_load <- function(pkg, extra_attachments = NULL) {
 
   if (!is_interactive() || !updateme_is_on()) {
     return(invisible(NULL))
   }
 
+  if (identical(pkg, "tidyverse")) {
+    cli::cat_line(tidyverse_attach_message(extra_attachments))
+
+    if (!is_attached("conflicted"))
+      print(get("tidyverse_conflicts", asNamespace("tidyverse"))())
+
+    return(invisible(NULL))
+  }
+
+  is_loaded <- paste0("package:", pkg) %in% search()
+
+  cli::cli_alert_info(paste0(
+    if (is_loaded) "Using " else "Loading ",
+    "{.pkg {pkg}} ",
+    package_version_describe(pkg)
+  ))
+
+  invisible(NULL)
+
+}
+
+package_version_describe <- function(pkg, inform_if_ahead = NULL, template = NULL) {
+
   installation_info <- package_installation_info(pkg)
+  current           <- packageVersion(pkg)
+  remote_vn_info    <- available_version(installation_info)
+  available         <- remote_vn_info[["Source_Version"]]
+  source            <- remote_vn_info[["Source_Name"]]
+  source_url        <- remote_vn_info[["Source_URL"]]
 
-  installed_version <- packageVersion(pkg)
-  available         <- available_version(installation_info)
-  repo_version      <- available[["Source_Version"]]
-  inform_if_ahead   <- inform_if_ahead %||% grepl("^Bioc", available[["Source_Name"]])
+  inform_if_ahead <- inform_if_ahead %||% grepl("^Bioc", source)
 
-  new_version_found <- !is.null(repo_version)
+  new_version_found <- !is.null(available)
 
-  currentness_unknown <- !new_version_found ||
-    !is.package_version(repo_version) ||
-    !is.package_version(installed_version)
+  currentness_is_unknown <- !new_version_found ||
+    !is.package_version(available) ||
+    !is.package_version(current)
 
-  currentness <- if (currentness_unknown)
+  currentness <- if (currentness_is_unknown)
     "unknown"
-  else if (installed_version < repo_version)
+  else if (current < available)
     "outdated"
-  else if (installed_version == repo_version)
+  else if (current == available)
     "up_to_date"
   else
     "ahead"
@@ -33,31 +58,39 @@ inform_load <- function(pkg, inform_if_ahead = NULL) {
     ahead = cli::col_br_magenta
   )
 
-  src_name <- available[["Source_Name"]]
-  src_url  <- available[["Source_URL"]]
+  show_extra_info <- currentness %in% c(
+    "outdated", "unknown", if (inform_if_ahead) "ahead"
+  )
 
-  extra_info <- if (new_version_found && currentness %in% c("outdated", "unknown", "ahead")) {
-    src_pretty <- if (is.null(src_url))
-      src_name
+  extra_info <- if (!new_version_found || !show_extra_info) {
+    ""
+  } else {
+    src <- if (is.null(source_url))
+      source
     else
-      cli::format_inline("{.href [{src_name}]({src_url})}")
+      cli::format_inline("{.href [{source}]({source_url})}")
+
+    vn <- available
 
     cli::col_grey(cli::style_italic(cli::format_inline(switch(currentness,
       outdated = ,
-      unknown  = " ({repo_version} now available from {src_pretty})",
-      ahead    = " ({repo_version} is the latest version on {src_pretty})"
+      unknown  = template %||% "({vn} now available from {src})",
+      ahead    = "({vn} is the latest version on {src})"
     ))))
   }
 
-  cli::cli_alert_info(paste0(
-    "Loading ",
-    cli::format_inline("{.pkg {pkg}}"), " ",
-    fmt_currentness(installed_version),
-    extra_info
-  ))
+  paste(fmt_currentness(style_version(current)), extra_info)
+}
 
-  invisible(NULL)
-
+style_version <- function(x) {
+  x <- as.character(x)
+  is_dev <- function(x) {
+    x <- suppressWarnings(as.numeric(x))
+    !is.na(x) & x >= 9000
+  }
+  pieces <- strsplit(x, ".", fixed = TRUE)
+  pieces <- lapply(pieces, function(x) ifelse(is_dev(x), cli::style_italic(x), x))
+  vapply(pieces, paste, collapse = ".", FUN.VALUE = character(1))
 }
 
 available_packages <- function(repos = getOption("repos")) {

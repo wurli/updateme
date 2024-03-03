@@ -217,6 +217,7 @@ desc_from_git <- function(username, repo, pkg = repo, type = c("github", "gitlab
     curl::handle_setheaders(handle, .list = auth_header)
 
   con <- curl::curl(file_url, handle = handle)
+  on.exit(try(close(con), silent = TRUE))
 
   tryCatch(
     readLines(con, warn = FALSE),
@@ -232,7 +233,7 @@ desc_from_git <- function(username, repo, pkg = repo, type = c("github", "gitlab
           i = private_repo_msg,
           i = paste(
             "Is the repo private? Perhaps you need to configure",
-            "an {.topic [access token](updateme::updateme_set_sources)}."
+            "an {.topic [access token](updateme::updateme_sources_set)}."
           )
         )
       } else if (grepl("302", msg)) {

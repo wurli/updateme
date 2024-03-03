@@ -5,7 +5,7 @@ bioc_version <- function(pkg = NULL) {
       return(vn[, 1:2])
   }
 
-  vn <- try(packageVersion("BiocVersion"), silent = TRUE)
+  vn <- installed_version("BiocVersion")
   if (inherits(vn, "numeric_version"))
     return(vn[, 1:2])
 

@@ -37,8 +37,9 @@ shim_library_3_1 <- function(package,
 
   if (!missing(package)) {
     package <- package_name(enquo(package), character.only = character.only)
+    extra_attachments <- tidyverse_extra_attachments(package)
 
-    out <- library(
+    out <- maybe_muffle(package)(library(
       package,
       pos = pos,
       lib.loc = lib.loc,
@@ -47,9 +48,9 @@ shim_library_3_1 <- function(package,
       warn.conflicts = FALSE,
       quietly = quietly,
       verbose = verbose
-    )
+    ))
 
-    inform_load(package)
+    inform_load(package, extra_attachments)
     handle_conflicted()
     invisible(out)
 
@@ -85,8 +86,9 @@ shim_library_3_6 <- function(package,
 
   if (!missing(package)) {
     package <- package_name(enquo(package), character.only = character.only)
+    extra_attachments <- tidyverse_extra_attachments(package)
 
-    out <- library(
+    out <- maybe_muffle(package)(library(
       package,
       pos = pos,
       lib.loc = lib.loc,
@@ -99,9 +101,9 @@ shim_library_3_6 <- function(package,
       exclude = exclude,
       include.only = include.only,
       attach.required = attach.required
-    )
+    ))
 
-    inform_load(package)
+    inform_load(package, extra_attachments)
     handle_conflicted()
     invisible(out)
 
@@ -129,16 +131,17 @@ shim_require_3_1 <- function(package,
   require <- the$conflicted_shims$require %||% require
 
   package <- package_name(enquo(package), character.only = character.only)
+  extra_attachments <- tidyverse_extra_attachments(package)
 
-  out <- require(
+  out <- maybe_muffle(package)(require(
     package,
     lib.loc = lib.loc,
     quietly = quietly,
     warn.conflicts = FALSE,
     character.only = TRUE
-  )
+  ))
 
-  inform_load(package)
+  inform_load(package, extra_attachments)
   handle_conflicted()
   invisible(out)
 }
@@ -156,8 +159,9 @@ shim_require_3_6 <- function(package,
   require <- the$conflicted_shims$require %||% require
 
   package <- package_name(enquo(package), character.only = character.only)
+  extra_attachments <- tidyverse_extra_attachments(package)
 
-  out <- require(
+  out <- maybe_muffle(package)(require(
     package,
     lib.loc = lib.loc,
     quietly = quietly,
@@ -167,9 +171,9 @@ shim_require_3_6 <- function(package,
     exclude = exclude,
     include.only = include.only,
     attach.required = attach.required
-  )
+  ))
 
-  inform_load(package)
+  inform_load(package, extra_attachments)
   handle_conflicted()
   invisible(out)
 }
@@ -209,6 +213,13 @@ handle_conflicted <- function() {
     conflicted_maybe_remove("library")
     conflicted_maybe_remove("require")
   }
+}
+
+maybe_muffle <- function(pkg) {
+  if (pkg == "tidyverse" && updateme_is_on())
+    suppressPackageStartupMessages
+  else
+    identity
 }
 
 conflicted_loaded <- function() {
