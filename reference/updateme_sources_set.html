@@ -25,6 +25,9 @@ options you set.'><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax
       <ul class="navbar-nav me-auto"><li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
+</li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
@@ -42,7 +45,7 @@ options you set.'><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Configure updateme lookup of new package versions</h1>
-      <small class="dont-index">Source: <a href="https://github.com/wurli/updateme/blob/HEAD/R/updateme_set_sources.R" class="external-link"><code>R/updateme_set_sources.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/wurli/updateme/blob/HEAD/R/updateme_sources_set.R" class="external-link"><code>R/updateme_sources_set.R</code></a></small>
       <div class="d-none name"><code>updateme_sources_set.Rd</code></div>
     </div>
 
@@ -60,17 +63,19 @@ options you set.</p>
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>...</dt>
-<dd><p>Named or unnamed arguments. Values should be either:</p><ul><li><p><code>"github"</code>/<code>"gitlab"</code>: new versions will be found from the package
-development version on GitHub/GitLab, if a repo can be identified using
-the package <code>DESCRIPTION</code></p></li>
-<li><p>One of <code>names(getOption("repo"))</code>: latest versions will be taken from
+<dd><p>Named or unnamed arguments. Values should be either:</p><ul><li><p>One of <code>names(getOption("repo"))</code>: latest versions will be taken from
 this source, if available</p></li>
+<li><p><code>"bioc"</code>: new versions will be looked for on Bioconductor</p></li>
+<li><p><code>"github"</code>/<code>"gitlab"</code>: new versions will looked for on on
+GitHub/GitLab, if a repo can be identified using the package
+<code>DESCRIPTION</code></p></li>
 <li><p>A URL pointing to a GitHub/GitLab repo, e.g.
 <code>"https://github.com/wurli/updateme"</code>: the latest version <em>for this
 particular package</em> will be taken from this project</p></li>
-<li><p><code>NULL</code>: updateme will not attempt to query new versions.
-Note that <code>NULL</code> inputs must always be named (i.e. you must specify this
-'per package').</p></li>
+<li><p><code>NA</code>: updateme will not attempt to query new versions.
+Note that <code>NA</code> inputs must always be named (i.e. you must specify this
+'per package')</p></li>
+<li><p><code>NULL</code>: return to the default behaviour</p></li>
 </ul><p>If arguments are named, names should indicate package which the option
 should apply to. If unnamed, the option will apply to all packages. See
 examples for more information.</p></dd>
@@ -89,9 +94,9 @@ examples for more information.</p></dd>
     <h2 id="private-repositories">Private Repositories<a class="anchor" aria-label="anchor" href="#private-repositories"></a></h2>
     
 
-<p>updateme supports packages stored in private repositories on GitHub and
-GitLab. To get upstream package version from either, you should only
-have to configure a personal access token (PAT).</p><ul><li><p>For GitHub packages, updateme checks, in order:</p><ul><li><p>The <code>UPDATEME_GITHUB_PAT</code> environmental variable</p></li>
+<p>updateme supports packages installed from private repositories on GitHub
+and GitLab. To get upstream package version from either, you should only have
+to configure a personal access token (PAT):</p><ul><li><p>For GitHub packages, updateme checks, in order:</p><ul><li><p>The <code>UPDATEME_GITHUB_PAT</code> environmental variable</p></li>
 <li><p>Any personal access tokens configured using <code><a href="https://gitcreds.r-lib.org/reference/gitcreds_get.html" class="external-link">gitcreds::gitcreds_set()</a></code></p></li>
 <li><p>The <code>GITHUB_PAT</code> environmental variable</p></li>
 <li><p>The <code>GITHUB_TOKEN</code> environmental variable</p></li>
