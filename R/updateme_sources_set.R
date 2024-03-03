@@ -6,20 +6,24 @@
 #'
 #' @param ... Named or unnamed arguments. Values should be either:
 #'
-#'   -   `"github"`/`"gitlab"`: new versions will be found from the package
-#'       development version on GitHub/GitLab, if a repo can be identified using
-#'       the package `DESCRIPTION`
-#'
 #'   -   One of `names(getOption("repo"))`: latest versions will be taken from
 #'       this source, if available
+#'
+#'   -   `"bioc"`: new versions will be looked for on Bioconductor
+#'
+#'   -   `"github"`/`"gitlab"`: new versions will looked for on on
+#'       GitHub/GitLab, if a repo can be identified using the package
+#'       `DESCRIPTION`
 #'
 #'   -   A URL pointing to a GitHub/GitLab repo, e.g.
 #'       `"https://github.com/wurli/updateme"`: the latest version *for this
 #'       particular package* will be taken from this project
 #'
-#'   -  `NULL`: {updateme} will not attempt to query new versions.
-#'      Note that `NULL` inputs must always be named (i.e. you must specify this
-#'      'per package').
+#'   -  `NA`: {updateme} will not attempt to query new versions.
+#'      Note that `NA` inputs must always be named (i.e. you must specify this
+#'      'per package')
+#'
+#'   -  `NULL`: return to the default behaviour
 #'
 #'   If arguments are named, names should indicate package which the option
 #'   should apply to. If unnamed, the option will apply to all packages. See
@@ -87,12 +91,19 @@ updateme_sources_set <- function(...) {
 }
 
 updateme_sources_set_impl <- function(...) {
+
+  if (...length() == 0L)
+    cli::cli_abort(call = caller_call(1), c(
+      "At least one argument must be supplied",
+      i = "Use {.code updateme::updateme_off()} to disable updateme"
+    ))
+
   # dots_list() prevents names being NULL
   dots     <- dots_list(...)
   out      <- imap(dots, updateme_sources_validate)
   sources  <- map(out, function(x) x[["Source_Name"]])
   packages <- map_chr(out, function(x) x[["Package"]] %||% "")
-  set_names(sources, packages)
+  compact(set_names(sources, packages))
 }
 
 preferred_sources <- function(pkg) {
@@ -115,17 +126,19 @@ updateme_sources_validate <- function(src, pkg = NULL, throw = cli::cli_abort) {
       throw(call = caller_call(6), c(
         "Invalid package source {.val {src}}.",
         "i" = "Package sources must be either:",
-        " " = "1. {.val github}/{.val gitlab}, to check the version on GitHub/GitLab if possible",
-        " " = '2. One of {.code names(getOption("repos"))}',
-        " " = "3. The URL of a specific GitHub repository, e.g. {.url https://github.com/wurli/updateme}",
-        " " = "4. The URL of a specific GitLab repository, e.g. {.url https://gitlab.com/r-packages/yum}",
-        " " = "5. {.val NULL} to turn {.pkg updateme} off for a package"
+        " " = '1. One of {.code names(getOption("repos"))}',
+        " " = "2. {.val bioc} to check te version on Bioconductor",
+        " " = "3. {.val github}/{.val gitlab} to check the version on GitHub/GitLab if possible",
+        " " = "4. The URL of a specific GitHub repository, e.g. {.url https://github.com/wurli/updateme}",
+        " " = "5. The URL of a specific GitLab repository, e.g. {.url https://gitlab.com/r-packages/yum}",
+        " " = "6. {.val NA} to turn {.pkg updateme} off for a package",
+        " " = "7. {.val NULL} to return to the default behaviour"
       ))
     }
     NULL
   }
 
-  src_ok <- is.character(src) || is.null(src)
+  src_ok <- is.character(src) || is.null(src) || is.na(src)
   pkg_ok <- is.character(pkg) || is.null(pkg)
 
   if (!src_ok || !pkg_ok) {
@@ -135,17 +148,18 @@ updateme_sources_validate <- function(src, pkg = NULL, throw = cli::cli_abort) {
   if (pkg == "")
     pkg <- NULL
 
-  if (any(is.na(src)))
-    src <- NULL
-
   if (is.null(src) && is.null(pkg)) {
     throw(call = caller_call(6), c(
       "Invalid package source",
-      i = "All {.val NULL} and {.val NA} arguments must be named"
+      i = "All {.val NULL} arguments must be named"
     ))
   }
 
+  if (is.null(src))
+    return(NULL)
+
   out <- list(
+    Available_Sources = NULL,
     Preferred_Source  = NULL,
     Package           = pkg,
     Source_Name       = src,
@@ -156,14 +170,21 @@ updateme_sources_validate <- function(src, pkg = NULL, throw = cli::cli_abort) {
     Bioc_Views        = NULL
   )
 
-  if (is.null(src)) {
+  if (is.na(src)) {
     out[["Preferred_Source"]] <- .updateme_skip
     return(out)
   }
 
   if (is_valid_repo(src)) {
-    out[["Preferred_Source"]] <- "repo"
-    out[["Repository"]] <- src
+    out[["Available_Sources"]] <- "repo"
+    out[["Preferred_Source"]]  <- "repo"
+    out[["Repository"]]        <- src
+    return(out)
+  }
+
+  if (identical(src, "bioc")) {
+    out[["Available_Sources"]] <- "bioc"
+    out[["Preferred_Source"]]  <- "bioc"
     return(out)
   }
 

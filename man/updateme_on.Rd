@@ -23,6 +23,6 @@ if (FALSE) {
 }
 }
 \seealso{
-\code{\link[=updateme_set_sources]{updateme_set_sources()}} to turn {updateme} off for individual
+\code{\link[=updateme_sources_set]{updateme_sources_set()}} to turn {updateme} off for individual
 packages
 }

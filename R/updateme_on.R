@@ -6,7 +6,7 @@
 #' @return `NULL`, invisibly
 #' @export
 #'
-#' @seealso [updateme_set_sources()] to turn {updateme} off for individual
+#' @seealso [updateme_sources_set()] to turn {updateme} off for individual
 #'   packages
 #'
 #' @examples

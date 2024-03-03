@@ -39,7 +39,7 @@ test_that("available_version() respects updateme.sources", {
     Source_Version = package_version("0.2.0")
   ))
 
-  updateme_sources_set(updateme.testpkg = NULL)
+  updateme_sources_set(updateme.testpkg = NA)
   expect_identical(available_version(info), NULL)
 
 })
