@@ -34,7 +34,7 @@ package_version_describe <- function(pkg, inform_if_ahead = NULL, template = NUL
   source            <- remote_vn_info[["Source_Name"]]
   source_url        <- remote_vn_info[["Source_URL"]]
 
-  inform_if_ahead <- inform_if_ahead %||% grepl("^Bioc", source)
+  inform_if_ahead <- inform_if_ahead %||% grepl("^Bioc", source) %or% FALSE
 
   new_version_found <- !is.null(available)
 
