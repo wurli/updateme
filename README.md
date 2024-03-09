@@ -12,10 +12,9 @@ you load them:
 
 ## Installation
 
-{updateme} is not yet on CRAN, but you can install it from GitHub using {pak}:
+You can install {updateme} from CRAN like so:
 ``` r
-# install.packages("pak")
-pak::pak("wurli/updateme")
+install.packages("updateme")
 ```
 
 ## Usage
@@ -25,18 +24,9 @@ packages. You may find you'd like to have {updateme} available all the time;
 in this case, consider adding this snippet to your `.Rprofile`:
 
 ``` r
-# If {updateme} isn't installed...
+# Install {updateme} if not installed already
 if (!requireNamespace("updateme", quietly = TRUE)) {
-
-  # If {pak} isn't installed...
-  if (!requireNamepsace("pak", quietly = TRUE)) {
-  
-    # Install {pak} from CRAN
-    install.packages("pak")
-  }
-  
-  # Use {pak} to install {updateme} from GitHub
-  pak::pak("wurli/updateme")
+  install.packages("wurli/updateme")
 }
 
 library(updateme)

@@ -6,7 +6,7 @@
 \alias{updateme-package}
 \title{updateme: Informative Messages About Outdated Packages}
 \description{
-When a package is loaded, the source repository is checked for new versions. A message is show in the console indicating whether the package is out of date.
+When a package is loaded, the source repository is checked for new versions and a message is shown in the console indicating whether the package is out of date.
 }
 \seealso{
 Useful links:
