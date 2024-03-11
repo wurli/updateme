@@ -26,7 +26,7 @@ in this case, consider adding this snippet to your `.Rprofile`:
 ``` r
 # Install {updateme} if not installed already
 if (!requireNamespace("updateme", quietly = TRUE)) {
-  install.packages("wurli/updateme")
+  install.packages("updateme")
 }
 
 library(updateme)
