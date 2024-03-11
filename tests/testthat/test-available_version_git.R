@@ -24,7 +24,7 @@ test_that("Description files can be read from GitHub private repos", {
   # NOTE: This PAT is 'fine-grained' and gives read-only access for a single
   # repo containing an empty package {updateme.testpkg.private}.
   withr::local_envvar(list(
-    UPDATEME_GITHUB_PAT = paste0(
+    GITHUB_PAT = paste0(
       "github_pat_11AEFKREY0bCtmUEn37oc7_MhIhcuvThFPzQ9Nmd74Bf",
       "kydKkvUgKx2NvYw9DEYtw7WUJ7VPW6UnvQVppv"
     )
@@ -70,7 +70,7 @@ test_that("Description files can be read from GitLab private repos", {
   # NOTE: This PAT is 'fine-grained' and gives read-only access for a single
   # repo containing an empty package {updateme.testpkg.private}.
   withr::local_envvar(list(
-    UPDATEME_GITLAB_PAT = "glpat-idE4upwYGmHjsiH-YYzw"
+    GITLAB_PAT = "glpat-idE4upwYGmHjsiH-YYzw"
   ))
 
   desc <- desc_from_git("wurli", "updateme.testpkg.private")

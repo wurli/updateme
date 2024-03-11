@@ -260,25 +260,25 @@ get_git_pat <- function(type = c("github", "gitlab")) {
 
   switch(type,
     github = {
-      updateme_env_var <- "UPDATEME_GITHUB_PAT"
-      git_name         <- "GitHub"
-      git_url          <- "https://github.com"
-      fallback_envvars <- c("GITHUB_PAT", "GITHUB_TOKEN")
+      envvars  <- c("GITHUB_PAT", "GITHUB_TOKEN")
+      git_name <- "GitHub"
+      git_url  <- "https://github.com"
     },
     gitlab = {
-      updateme_env_var <- "UPDATEME_GITLAB_PAT"
-      git_name         <- "GitLab"
-      git_url          <- "https://gitlab.com"
-      fallback_envvars <- c("GITLAB_PAT", "GITLAB_TOKEN")
+      envvars  <- c("GITLAB_PAT", "GITLAB_TOKEN")
+      git_name <- "GitLab"
+      git_url  <- "https://gitlab.com"
     }
   )
 
-  # 1. check special updateme env var
-  updateme_pat <- env_var(updateme_env_var)
-  if (!is.null(updateme_pat))
-    return(updateme_pat)
+  # Check standard env vars
+  for (envvar in envvars) {
+    pat <- env_var(envvar)
+    if (!is.null(pat))
+      return(pat)
+  }
 
-  # 2. check using {gitcreds}
+  # Check using {gitcreds}
   if (is_installed("gitcreds")) {
     # gitcreds may error if no git installed, no creds set, etc
     try(silent = TRUE, {
@@ -287,11 +287,5 @@ get_git_pat <- function(type = c("github", "gitlab")) {
     })
   }
 
-  # 3. Check standard env vars
-  for (envvar in fallback_envvars) {
-    pat <- env_var(envvar)
-    if (!is.null(pat))
-      return(pat)
-  }
   NULL
 }

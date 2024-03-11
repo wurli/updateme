@@ -2,7 +2,7 @@
 % Please edit documentation in R/updateme_sources_set.R
 \name{updateme_sources_set}
 \alias{updateme_sources_set}
-\title{Configure {updateme} lookup of new package versions}
+\title{Configure updateme lookup of new package versions}
 \usage{
 updateme_sources_set(...)
 }
@@ -18,7 +18,7 @@ GitHub/GitLab, if a repo can be identified using the package
 \item A URL pointing to a GitHub/GitLab repo, e.g.
 \code{"https://github.com/wurli/updateme"}: the latest version \emph{for this
 particular package} will be taken from this project
-\item \code{NA}: {updateme} will not attempt to query new versions.
+\item \code{NA}: updateme will not attempt to query new versions.
 Note that \code{NA} inputs must always be named (i.e. you must specify this
 'per package')
 \item \code{NULL}: return to the default behaviour
@@ -39,23 +39,21 @@ options you set.
 }
 \section{Private Repositories}{
 
-{updateme} supports packages installed from private repositories on GitHub
+updateme supports packages installed from private repositories on GitHub
 and GitLab. To get upstream package version from either, you should only have
 to configure a personal access token (PAT):
 \itemize{
-\item For GitHub packages, {updateme} checks, in order:
+\item For GitHub packages, updateme checks, in order:
 \itemize{
-\item The \code{UPDATEME_GITHUB_PAT} environmental variable
-\item Any personal access tokens configured using \code{\link[gitcreds:gitcreds_get]{gitcreds::gitcreds_set()}}
 \item The \code{GITHUB_PAT} environmental variable
 \item The \code{GITHUB_TOKEN} environmental variable
-}
-\item For GitLab packages, {updateme} checks, in order:
-\itemize{
-\item The \code{UPDATEME_GITLAB_PAT} environmental variable
 \item Any personal access tokens configured using \code{\link[gitcreds:gitcreds_get]{gitcreds::gitcreds_set()}}
+}
+\item For GitLab packages, updateme checks, in order:
+\itemize{
 \item The \code{GITLAB_PAT} environmental variable
 \item The \code{GITLAB_TOKEN} environmental variable
+\item Any personal access tokens configured using \code{\link[gitcreds:gitcreds_get]{gitcreds::gitcreds_set()}}
 }
 }
 }
@@ -65,7 +63,7 @@ if (FALSE) {
 
   # If you want to check non-standard repos for new versions of packages,
   # you'll first have to set the repos global option. Note that each
-  # option must be named for compatibility with {updateme}
+  # option must be named for compatibility with updateme
   options(repos = c(
 
     # Your default repos, e.g. c(CRAN = "https://cloud.r-project.org")
@@ -93,6 +91,6 @@ if (FALSE) {
 
 }
 \seealso{
-\code{\link[=updateme_on]{updateme_on()}} and \code{\link[=updateme_off]{updateme_off()}} to disable {updateme} for all
+\code{\link[=updateme_on]{updateme_on()}} and \code{\link[=updateme_off]{updateme_off()}} to disable updateme for all
 packages
 }

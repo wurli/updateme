@@ -1,12 +1,12 @@
-#' Temporarily turn {updateme} off for all packages
+#' Temporarily turn updateme off for all packages
 #'
 #' These functions may be useful if you find the slight delay caused by
-#' {updateme} looking up new package versions to be slowing down your workflow.
+#' updateme looking up new package versions to be slowing down your workflow.
 #'
 #' @return `NULL`, invisibly
 #' @export
 #'
-#' @seealso [updateme_sources_set()] to turn {updateme} off for individual
+#' @seealso [updateme_sources_set()] to turn updateme off for individual
 #'   packages
 #'
 #' @examples

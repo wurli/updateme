@@ -3,7 +3,7 @@
 \name{updateme_on}
 \alias{updateme_on}
 \alias{updateme_off}
-\title{Temporarily turn {updateme} off for all packages}
+\title{Temporarily turn updateme off for all packages}
 \usage{
 updateme_on()
 
@@ -14,7 +14,7 @@ updateme_off()
 }
 \description{
 These functions may be useful if you find the slight delay caused by
-{updateme} looking up new package versions to be slowing down your workflow.
+updateme looking up new package versions to be slowing down your workflow.
 }
 \examples{
 if (FALSE) {
@@ -23,6 +23,6 @@ if (FALSE) {
 }
 }
 \seealso{
-\code{\link[=updateme_sources_set]{updateme_sources_set()}} to turn {updateme} off for individual
+\code{\link[=updateme_sources_set]{updateme_sources_set()}} to turn updateme off for individual
 packages
 }

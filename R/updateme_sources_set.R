@@ -1,4 +1,4 @@
-#' Configure {updateme} lookup of new package versions
+#' Configure updateme lookup of new package versions
 #'
 #' This function is a helper for setting the `"updateme.sources"`
 #' global option. It provides a user-friendly interface and validation of the
@@ -19,7 +19,7 @@
 #'       `"https://github.com/wurli/updateme"`: the latest version *for this
 #'       particular package* will be taken from this project
 #'
-#'   -  `NA`: {updateme} will not attempt to query new versions.
+#'   -  `NA`: updateme will not attempt to query new versions.
 #'      Note that `NA` inputs must always be named (i.e. you must specify this
 #'      'per package')
 #'
@@ -30,28 +30,25 @@
 #'   examples for more information.
 #'
 #' @section Private Repositories:
-#' {updateme} supports packages installed from private repositories on GitHub
+#' updateme supports packages installed from private repositories on GitHub
 #' and GitLab. To get upstream package version from either, you should only have
 #' to configure a personal access token (PAT):
 #'
-#' * For GitHub packages, {updateme} checks, in order:
-#'   * The `UPDATEME_GITHUB_PAT` environmental variable
-#'   * Any personal access tokens configured using [gitcreds::gitcreds_set()]
+#' * For GitHub packages, updateme checks, in order:
 #'   * The `GITHUB_PAT` environmental variable
 #'   * The `GITHUB_TOKEN` environmental variable
-#' * For GitLab packages, {updateme} checks, in order:
-#'   * The `UPDATEME_GITLAB_PAT` environmental variable
 #'   * Any personal access tokens configured using [gitcreds::gitcreds_set()]
+#' * For GitLab packages, updateme checks, in order:
 #'   * The `GITLAB_PAT` environmental variable
 #'   * The `GITLAB_TOKEN` environmental variable
-#'
+#'   * Any personal access tokens configured using [gitcreds::gitcreds_set()]
 #'
 #' @return The result of setting
 #'   `options(updateme.sources = <new_options>)`
 #'
 #' @export
 #'
-#' @seealso [updateme_on()] and [updateme_off()] to disable {updateme} for all
+#' @seealso [updateme_on()] and [updateme_off()] to disable updateme for all
 #'   packages
 #'
 #' @examples
@@ -59,7 +56,7 @@
 #'
 #'   # If you want to check non-standard repos for new versions of packages,
 #'   # you'll first have to set the repos global option. Note that each
-#'   # option must be named for compatibility with {updateme}
+#'   # option must be named for compatibility with updateme
 #'   options(repos = c(
 #'
 #'     # Your default repos, e.g. c(CRAN = "https://cloud.r-project.org")
