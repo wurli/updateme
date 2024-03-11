@@ -26,6 +26,5 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0),
     withr
-VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
