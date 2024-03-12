@@ -24,12 +24,9 @@ packages. You may find you'd like to have {updateme} available all the time;
 in this case, consider adding this snippet to your `.Rprofile`:
 
 ``` r
-# Install {updateme} if not installed already
-if (!requireNamespace("updateme", quietly = TRUE)) {
-  install.packages("updateme")
+if (interactive()) {
+  suppressMessages(require(updateme))
 }
-
-library(updateme)
 ```
 
 ## Configuration
