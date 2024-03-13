@@ -59,36 +59,38 @@ to configure a personal access token (PAT):
 }
 
 \examples{
-if (FALSE) {
+# If you want to check non-standard repos for new versions of packages,
+# you'll first have to set the repos global option. Note that each
+# option must be named for compatibility with updateme
+old_repos <- options(repos = c(
 
-  # If you want to check non-standard repos for new versions of packages,
-  # you'll first have to set the repos global option. Note that each
-  # option must be named for compatibility with updateme
-  options(repos = c(
+  # Your default CRAN mirror will likely be something like this
+  CRAN = "https://cloud.r-project.org",
 
-    # Your default repos, e.g. c(CRAN = "https://cloud.r-project.org")
-    getOption("repos"),
+  # The r-lib r-universe, including dev versions of infrastructure packages
+  # like cli, rlang, etc
+  `r-lib` = "https://r-lib.r-universe.dev"
+))
 
-    # The tidyverse r-universe, including dev versions of tidyverse packages
-    tidyverse = "https://tidyverse.r-universe.dev",
+# 1. New versions will first be looked up from the r-lib R universe by default
+# 2. If not found, they will be looked up from the usual CRAN mirror
+# 3. dplyr will always be first looked up from GitHub
+# 4. ggplot2 won't be looked up or notified about
+old_updateme_sources <- updateme_sources_set(
+  "r-lib",
+  "CRAN",
+  dplyr = "https://github.com/tidyverse/dplyr", # Name is optional here
+  ggplot2 = NA
+)
 
-    # The r-lib r-universe, including dev versions of infrastructure packages
-    # like {cli}, {rlang}, etc
-    rlib = "https://r-lib.r-universe.dev"
-  ))
-
-  # 1. New versions will first be looked up in the tidyverse r-universe
-  # 2. If not found, they will be looked up from your usual CRAN mirror
-  # 3. {bslib} will always be first looked up from GitHub
-  # 4. {cli} will always be first looked up from the r-lib r-universe
-  updateme_sources_set(
-    "tidyverse",
-    "CRAN",
-    bslib = "https://github.com/rstudio/bslib", # Name is optional here
-    cli = "rlib"
-  )
+# memoise should now be looked up from the r-lib r-universe
+if (interactive()) {
+  library(memoise)
 }
 
+# Restore old options
+options(old_repos)
+options(old_updateme_sources)
 }
 \seealso{
 \code{\link[=updateme_on]{updateme_on()}} and \code{\link[=updateme_off]{updateme_off()}} to disable updateme for all

@@ -123,8 +123,8 @@ available_version_impl_repo <- function(pkg, repo = NULL, repo_alias = NULL) {
       sub(x = _, "/R/.+$", "") |>
       sub(x = _, "/src/contrib$", "")
 
-    repo_alias <- names(repos_option)[grepl(pattern, repos_option, fixed = TRUE)]
-    if (length(repo_alias) == 0L || identical(repo_alias, ""))
+    repo_alias <- names(repos_option)[grepl(pattern, repos_option, fixed = TRUE)][1]
+    if (is.null(repo_alias) || any(is.na(repo_alias)) || identical(repo_alias, ""))
       repo_alias <- repo
   }
 

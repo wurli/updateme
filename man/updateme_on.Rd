@@ -10,17 +10,11 @@ updateme_on()
 updateme_off()
 }
 \value{
-\code{NULL}, invisibly
+The old \code{updateme.on} option, as returned by \code{options()}
 }
 \description{
 These functions may be useful if you find the slight delay caused by
 updateme looking up new package versions to be slowing down your workflow.
-}
-\examples{
-if (FALSE) {
-  updateme_off()
-  updateme_on()
-}
 }
 \seealso{
 \code{\link[=updateme_sources_set]{updateme_sources_set()}} to turn updateme off for individual
