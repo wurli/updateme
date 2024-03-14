@@ -1,10 +1,8 @@
-^renv$
-^renv\.lock$
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
-^updateme-demo\.gif$
 ^\.github$
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^readme-files$
