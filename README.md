@@ -14,7 +14,8 @@ you load them:
 
 {updateme} works with packages installed from CRAN (and CRAN-like repos),
 Bioconductor, GitHub and GitLab. Packages installed from Bioconductor are
-intelligently checked against the version of Bioconductor you're using:
+intelligently checked against the version of Bioconductor you're using, and 
+these get a special message if they're more recent than they probably should be:
 
 ![](https://raw.githubusercontent.com/wurli/updateme/release-cran/readme-files/updateme-bioc-pkgs.gif)
 
