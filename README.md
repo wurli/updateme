@@ -4,11 +4,33 @@
 [![R-CMD-check](https://github.com/wurli/updateme/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/wurli/updateme/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
+## What's in the box?
+
 {updateme} modifies `library()` to tell you if your packages are up to date when
 you load them:
 
 <!-- GitHub link used b/c pkgdown doesn't like file path -->
-![](https://raw.githubusercontent.com/wurli/updateme/main/updateme-demo.gif)
+![](https://raw.githubusercontent.com/wurli/updateme/release-cran/readme-files/updateme-cran-pkgs.gif)
+
+{updateme} works with packages installed from CRAN (and CRAN-like repos),
+Bioconductor, GitHub and GitLab. Packages installed from Bioconductor are
+intelligently checked against the version of Bioconductor you're using:
+
+![](https://raw.githubusercontent.com/wurli/updateme/release-cran/readme-files/updateme-bioc-pkgs.gif)
+
+The tidyverse is a special case, which gets its own modified startup message:
+
+![](https://raw.githubusercontent.com/wurli/updateme/release-cran/readme-files/updateme-tidyverse-msg.gif)
+
+{updateme} is configurable using
+[`updateme_sources_set()`](https://wurli.github.io/updateme/reference/updateme_sources_set.html). If, for example, you're using the development version of {lubridate} but you'd 
+like to see which version is currently on CRAN, you can get this behaviour like 
+so:
+
+![](https://raw.githubusercontent.com/wurli/updateme/release-cran/readme-files/updateme-sources-set.gif)
+
+By default, {updateme} will check for new versions of a given package from 
+wherever your version seems to have been installed from. 
 
 ## Installation
 
@@ -17,11 +39,10 @@ You can install {updateme} from CRAN like so:
 install.packages("updateme")
 ```
 
-## Usage
+## Use {updateme} by default
 
-To use {updateme}, simply call `library(updateme)` before loading other 
-packages. You may find you'd like to have {updateme} available all the time;
-in this case, consider adding this snippet to your `.Rprofile`:
+If you find you'd like to have {updateme} available all the time, consider 
+adding this snippet to your `.Rprofile`:
 
 ``` r
 if (interactive()) {
@@ -29,20 +50,10 @@ if (interactive()) {
 }
 ```
 
-## Configuration
-
-### Package sources
-
-By default, new versions of packages will be looked up from the location
-where they seem to have been installed from. If you installed from CRAN
-(e.g. using `install.packages()`), {updateme} will check CRAN for a newer
-version, and similarly with packages installed from Bioconductor, GitHub, and 
-GitLab.
-
-Occasionally you may want more control over where {updateme} looks for new
-package versions. You can configure this behaviour, including turning {updateme}
-off for particular packages, using `updateme_sources_set()`. If you want to 
-temporarily disable {updateme} entirely you can do so using `updateme_off()`.
+If {updateme} ever gets annoying, you can turn it off using 
+[`updateme_off()`](https://wurli.github.io/updateme/reference/updateme_on.html),
+and back on with 
+[`updateme_on()`](https://wurli.github.io/updateme/reference/updateme_on.html).
 
 ### Caching
 
