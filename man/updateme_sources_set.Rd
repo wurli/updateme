@@ -2,7 +2,7 @@
 % Please edit documentation in R/updateme_sources_set.R
 \name{updateme_sources_set}
 \alias{updateme_sources_set}
-\title{Configure {updateme} lookup of new package versions}
+\title{Configure updateme lookup of new package versions}
 \usage{
 updateme_sources_set(...)
 }
@@ -18,7 +18,7 @@ GitHub/GitLab, if a repo can be identified using the package
 \item A URL pointing to a GitHub/GitLab repo, e.g.
 \code{"https://github.com/wurli/updateme"}: the latest version \emph{for this
 particular package} will be taken from this project
-\item \code{NA}: {updateme} will not attempt to query new versions.
+\item \code{NA}: updateme will not attempt to query new versions.
 Note that \code{NA} inputs must always be named (i.e. you must specify this
 'per package')
 \item \code{NULL}: return to the default behaviour
@@ -39,60 +39,60 @@ options you set.
 }
 \section{Private Repositories}{
 
-{updateme} supports packages installed from private repositories on GitHub
+updateme supports packages installed from private repositories on GitHub
 and GitLab. To get upstream package version from either, you should only have
 to configure a personal access token (PAT):
 \itemize{
-\item For GitHub packages, {updateme} checks, in order:
+\item For GitHub packages, updateme checks, in order:
 \itemize{
-\item The \code{UPDATEME_GITHUB_PAT} environmental variable
-\item Any personal access tokens configured using \code{\link[gitcreds:gitcreds_get]{gitcreds::gitcreds_set()}}
 \item The \code{GITHUB_PAT} environmental variable
 \item The \code{GITHUB_TOKEN} environmental variable
-}
-\item For GitLab packages, {updateme} checks, in order:
-\itemize{
-\item The \code{UPDATEME_GITLAB_PAT} environmental variable
 \item Any personal access tokens configured using \code{\link[gitcreds:gitcreds_get]{gitcreds::gitcreds_set()}}
+}
+\item For GitLab packages, updateme checks, in order:
+\itemize{
 \item The \code{GITLAB_PAT} environmental variable
 \item The \code{GITLAB_TOKEN} environmental variable
+\item Any personal access tokens configured using \code{\link[gitcreds:gitcreds_get]{gitcreds::gitcreds_set()}}
 }
 }
 }
 
 \examples{
-if (FALSE) {
+# If you want to check non-standard repos for new versions of packages,
+# you'll first have to set the repos global option. Note that each
+# option must be named for compatibility with updateme
+old_repos <- options(repos = c(
 
-  # If you want to check non-standard repos for new versions of packages,
-  # you'll first have to set the repos global option. Note that each
-  # option must be named for compatibility with {updateme}
-  options(repos = c(
+  # Your default CRAN mirror will likely be something like this
+  CRAN = "https://cloud.r-project.org",
 
-    # Your default repos, e.g. c(CRAN = "https://cloud.r-project.org")
-    getOption("repos"),
+  # The r-lib r-universe, including dev versions of infrastructure packages
+  # like cli, rlang, etc
+  `r-lib` = "https://r-lib.r-universe.dev"
+))
 
-    # The tidyverse r-universe, including dev versions of tidyverse packages
-    tidyverse = "https://tidyverse.r-universe.dev",
+# 1. New versions will first be looked up from the r-lib R universe by default
+# 2. If not found, they will be looked up from the usual CRAN mirror
+# 3. dplyr will always be first looked up from GitHub
+# 4. ggplot2 won't be looked up or notified about
+old_updateme_sources <- updateme_sources_set(
+  "r-lib",
+  "CRAN",
+  dplyr = "https://github.com/tidyverse/dplyr", # Name is optional here
+  ggplot2 = NA
+)
 
-    # The r-lib r-universe, including dev versions of infrastructure packages
-    # like {cli}, {rlang}, etc
-    rlib = "https://r-lib.r-universe.dev"
-  ))
-
-  # 1. New versions will first be looked up in the tidyverse r-universe
-  # 2. If not found, they will be looked up from your usual CRAN mirror
-  # 3. {bslib} will always be first looked up from GitHub
-  # 4. {cli} will always be first looked up from the r-lib r-universe
-  updateme_sources_set(
-    "tidyverse",
-    "CRAN",
-    bslib = "https://github.com/rstudio/bslib", # Name is optional here
-    cli = "rlib"
-  )
+# memoise should now be looked up from the r-lib r-universe
+if (interactive()) {
+  library(memoise)
 }
 
+# Restore old options
+options(old_repos)
+options(old_updateme_sources)
 }
 \seealso{
-\code{\link[=updateme_on]{updateme_on()}} and \code{\link[=updateme_off]{updateme_off()}} to disable {updateme} for all
+\code{\link[=updateme_on]{updateme_on()}} and \code{\link[=updateme_off]{updateme_off()}} to disable updateme for all
 packages
 }

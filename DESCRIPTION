@@ -3,8 +3,8 @@ Type: Package
 Title: Informative Messages About Outdated Packages
 Version: 0.1.0
 Authors@R: person("Jacob", "Scott", email = "jscott2718@gmail.com", role = c("aut", "cre"))
-Description: When a package is loaded, the source repository is checked for 
-    new versions and a message is show in the console indicating whether the 
+Description: When a package is loaded, the source repository is checked for
+    new versions and a message is shown in the console indicating whether the
     package is out of date.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -26,6 +26,5 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0),
     withr
-VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3

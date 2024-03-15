@@ -1,4 +1,4 @@
-#' Configure {updateme} lookup of new package versions
+#' Configure updateme lookup of new package versions
 #'
 #' This function is a helper for setting the `"updateme.sources"`
 #' global option. It provides a user-friendly interface and validation of the
@@ -19,7 +19,7 @@
 #'       `"https://github.com/wurli/updateme"`: the latest version *for this
 #'       particular package* will be taken from this project
 #'
-#'   -  `NA`: {updateme} will not attempt to query new versions.
+#'   -  `NA`: updateme will not attempt to query new versions.
 #'      Note that `NA` inputs must always be named (i.e. you must specify this
 #'      'per package')
 #'
@@ -30,62 +30,60 @@
 #'   examples for more information.
 #'
 #' @section Private Repositories:
-#' {updateme} supports packages installed from private repositories on GitHub
+#' updateme supports packages installed from private repositories on GitHub
 #' and GitLab. To get upstream package version from either, you should only have
 #' to configure a personal access token (PAT):
 #'
-#' * For GitHub packages, {updateme} checks, in order:
-#'   * The `UPDATEME_GITHUB_PAT` environmental variable
-#'   * Any personal access tokens configured using [gitcreds::gitcreds_set()]
+#' * For GitHub packages, updateme checks, in order:
 #'   * The `GITHUB_PAT` environmental variable
 #'   * The `GITHUB_TOKEN` environmental variable
-#' * For GitLab packages, {updateme} checks, in order:
-#'   * The `UPDATEME_GITLAB_PAT` environmental variable
 #'   * Any personal access tokens configured using [gitcreds::gitcreds_set()]
+#' * For GitLab packages, updateme checks, in order:
 #'   * The `GITLAB_PAT` environmental variable
 #'   * The `GITLAB_TOKEN` environmental variable
-#'
+#'   * Any personal access tokens configured using [gitcreds::gitcreds_set()]
 #'
 #' @return The result of setting
 #'   `options(updateme.sources = <new_options>)`
 #'
 #' @export
 #'
-#' @seealso [updateme_on()] and [updateme_off()] to disable {updateme} for all
+#' @seealso [updateme_on()] and [updateme_off()] to disable updateme for all
 #'   packages
 #'
 #' @examples
-#' if (FALSE) {
+#' # If you want to check non-standard repos for new versions of packages,
+#' # you'll first have to set the repos global option. Note that each
+#' # option must be named for compatibility with updateme
+#' old_repos <- options(repos = c(
 #'
-#'   # If you want to check non-standard repos for new versions of packages,
-#'   # you'll first have to set the repos global option. Note that each
-#'   # option must be named for compatibility with {updateme}
-#'   options(repos = c(
+#'   # Your default CRAN mirror will likely be something like this
+#'   CRAN = "https://cloud.r-project.org",
 #'
-#'     # Your default repos, e.g. c(CRAN = "https://cloud.r-project.org")
-#'     getOption("repos"),
+#'   # The r-lib r-universe, including dev versions of infrastructure packages
+#'   # like cli, rlang, etc
+#'   `r-lib` = "https://r-lib.r-universe.dev"
+#' ))
 #'
-#'     # The tidyverse r-universe, including dev versions of tidyverse packages
-#'     tidyverse = "https://tidyverse.r-universe.dev",
+#' # 1. New versions will first be looked up from the r-lib R universe by default
+#' # 2. If not found, they will be looked up from the usual CRAN mirror
+#' # 3. dplyr will always be first looked up from GitHub
+#' # 4. ggplot2 won't be looked up or notified about
+#' old_updateme_sources <- updateme_sources_set(
+#'   "r-lib",
+#'   "CRAN",
+#'   dplyr = "https://github.com/tidyverse/dplyr", # Name is optional here
+#'   ggplot2 = NA
+#' )
 #'
-#'     # The r-lib r-universe, including dev versions of infrastructure packages
-#'     # like {cli}, {rlang}, etc
-#'     rlib = "https://r-lib.r-universe.dev"
-#'   ))
-#'
-#'   # 1. New versions will first be looked up in the tidyverse r-universe
-#'   # 2. If not found, they will be looked up from your usual CRAN mirror
-#'   # 3. {bslib} will always be first looked up from GitHub
-#'   # 4. {cli} will always be first looked up from the r-lib r-universe
-#'   updateme_sources_set(
-#'     "tidyverse",
-#'     "CRAN",
-#'     bslib = "https://github.com/rstudio/bslib", # Name is optional here
-#'     cli = "rlib"
-#'   )
+#' # memoise should now be looked up from the r-lib r-universe
+#' if (interactive()) {
+#'   library(memoise)
 #' }
 #'
-# TODO: Add .append arg?
+#' # Restore old options
+#' options(old_repos)
+#' options(old_updateme_sources)
 updateme_sources_set <- function(...) {
   options(updateme.sources = updateme_sources_set_impl(...))
 }
@@ -122,17 +120,17 @@ updateme_sources_validate <- function(src, pkg = NULL, throw = cli::cli_abort) {
 
   handle_no_sources <- function() {
     if (!is.null(throw)) {
-      repos <- names(getOption("repos"))
+      repos <- cli::cli_vec(names(getOption("repos")), style = list("vec-last" = " or "))
       throw(call = caller_call(6), c(
         "Invalid package source {.val {src}}.",
-        "i" = "Package sources must be either:",
-        " " = '1. One of {.code names(getOption("repos"))}',
-        " " = "2. {.val bioc} to check te version on Bioconductor",
-        " " = "3. {.val github}/{.val gitlab} to check the version on GitHub/GitLab if possible",
-        " " = "4. The URL of a specific GitHub repository, e.g. {.url https://github.com/wurli/updateme}",
-        " " = "5. The URL of a specific GitLab repository, e.g. {.url https://gitlab.com/r-packages/yum}",
-        " " = "6. {.val NA} to turn {.pkg updateme} off for a package",
-        " " = "7. {.val NULL} to return to the default behaviour"
+        "i" = "Inputs must be:",
+        " " = '- One of {.code names(getOption("repos"))}, i.e. {.val {repos}}',
+        " " = "- {.val bioc} to check the version on Bioconductor",
+        " " = "- {.val github}/{.val gitlab} to check the version on GitHub/GitLab if possible",
+        " " = "- The URL of a specific GitHub repository, e.g. {.val https://github.com/wurli/updateme}",
+        " " = "- The URL of a specific GitLab repository, e.g. {.val https://gitlab.com/r-packages/yum}",
+        " " = "- {.val NA} to turn {.pkg updateme} off for a package",
+        " " = "- {.val NULL} to return to the default behaviour"
       ))
     }
     NULL
