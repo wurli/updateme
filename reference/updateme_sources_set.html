@@ -96,15 +96,13 @@ examples for more information.</p></dd>
 
 <p>updateme supports packages installed from private repositories on GitHub
 and GitLab. To get upstream package version from either, you should only have
-to configure a personal access token (PAT):</p><ul><li><p>For GitHub packages, updateme checks, in order:</p><ul><li><p>The <code>UPDATEME_GITHUB_PAT</code> environmental variable</p></li>
-<li><p>Any personal access tokens configured using <code><a href="https://gitcreds.r-lib.org/reference/gitcreds_get.html" class="external-link">gitcreds::gitcreds_set()</a></code></p></li>
-<li><p>The <code>GITHUB_PAT</code> environmental variable</p></li>
+to configure a personal access token (PAT):</p><ul><li><p>For GitHub packages, updateme checks, in order:</p><ul><li><p>The <code>GITHUB_PAT</code> environmental variable</p></li>
 <li><p>The <code>GITHUB_TOKEN</code> environmental variable</p></li>
-</ul></li>
-<li><p>For GitLab packages, updateme checks, in order:</p><ul><li><p>The <code>UPDATEME_GITLAB_PAT</code> environmental variable</p></li>
 <li><p>Any personal access tokens configured using <code><a href="https://gitcreds.r-lib.org/reference/gitcreds_get.html" class="external-link">gitcreds::gitcreds_set()</a></code></p></li>
-<li><p>The <code>GITLAB_PAT</code> environmental variable</p></li>
+</ul></li>
+<li><p>For GitLab packages, updateme checks, in order:</p><ul><li><p>The <code>GITLAB_PAT</code> environmental variable</p></li>
 <li><p>The <code>GITLAB_TOKEN</code> environmental variable</p></li>
+<li><p>Any personal access tokens configured using <code><a href="https://gitcreds.r-lib.org/reference/gitcreds_get.html" class="external-link">gitcreds::gitcreds_set()</a></code></p></li>
 </ul></li>
 </ul></div>
     <div class="section level2">
@@ -115,36 +113,38 @@ packages</p></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># If you want to check non-standard repos for new versions of packages,</span></span></span>
+<span class="r-in"><span><span class="co"># you'll first have to set the repos global option. Note that each</span></span></span>
+<span class="r-in"><span><span class="co"># option must be named for compatibility with updateme</span></span></span>
+<span class="r-in"><span><span class="va">old_repos</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="co"># If you want to check non-standard repos for new versions of packages,</span></span></span>
-<span class="r-in"><span>  <span class="co"># you'll first have to set the repos global option. Note that each</span></span></span>
-<span class="r-in"><span>  <span class="co"># option must be named for compatibility with {updateme}</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="co"># Your default CRAN mirror will likely be something like this</span></span></span>
+<span class="r-in"><span>  CRAN <span class="op">=</span> <span class="st">"https://cloud.r-project.org"</span>,</span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>    <span class="co"># Your default repos, e.g. c(CRAN = "https://cloud.r-project.org")</span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="co"># The r-lib r-universe, including dev versions of infrastructure packages</span></span></span>
+<span class="r-in"><span>  <span class="co"># like cli, rlang, etc</span></span></span>
+<span class="r-in"><span>  `r-lib` <span class="op">=</span> <span class="st">"https://r-lib.r-universe.dev"</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>    <span class="co"># The tidyverse r-universe, including dev versions of tidyverse packages</span></span></span>
-<span class="r-in"><span>    tidyverse <span class="op">=</span> <span class="st">"https://tidyverse.r-universe.dev"</span>,</span></span>
+<span class="r-in"><span><span class="co"># 1. New versions will first be looked up from the r-lib R universe by default</span></span></span>
+<span class="r-in"><span><span class="co"># 2. If not found, they will be looked up from the usual CRAN mirror</span></span></span>
+<span class="r-in"><span><span class="co"># 3. dplyr will always be first looked up from GitHub</span></span></span>
+<span class="r-in"><span><span class="co"># 4. ggplot2 won't be looked up or notified about</span></span></span>
+<span class="r-in"><span><span class="va">old_updateme_sources</span> <span class="op">&lt;-</span> <span class="fu">updateme_sources_set</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"r-lib"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"CRAN"</span>,</span></span>
+<span class="r-in"><span>  dplyr <span class="op">=</span> <span class="st">"https://github.com/tidyverse/dplyr"</span>, <span class="co"># Name is optional here</span></span></span>
+<span class="r-in"><span>  ggplot2 <span class="op">=</span> <span class="cn">NA</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>    <span class="co"># The r-lib r-universe, including dev versions of infrastructure packages</span></span></span>
-<span class="r-in"><span>    <span class="co"># like {cli}, {rlang}, etc</span></span></span>
-<span class="r-in"><span>    rlib <span class="op">=</span> <span class="st">"https://r-lib.r-universe.dev"</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="co"># 1. New versions will first be looked up in the tidyverse r-universe</span></span></span>
-<span class="r-in"><span>  <span class="co"># 2. If not found, they will be looked up from your usual CRAN mirror</span></span></span>
-<span class="r-in"><span>  <span class="co"># 3. {bslib} will always be first looked up from GitHub</span></span></span>
-<span class="r-in"><span>  <span class="co"># 4. {cli} will always be first looked up from the r-lib r-universe</span></span></span>
-<span class="r-in"><span>  <span class="fu">updateme_sources_set</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="st">"tidyverse"</span>,</span></span>
-<span class="r-in"><span>    <span class="st">"CRAN"</span>,</span></span>
-<span class="r-in"><span>    bslib <span class="op">=</span> <span class="st">"https://github.com/rstudio/bslib"</span>, <span class="co"># Name is optional here</span></span></span>
-<span class="r-in"><span>    cli <span class="op">=</span> <span class="st">"rlib"</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># memoise should now be looked up from the r-lib r-universe</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://memoise.r-lib.org" class="external-link">memoise</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Restore old options</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">old_repos</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">old_updateme_sources</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
